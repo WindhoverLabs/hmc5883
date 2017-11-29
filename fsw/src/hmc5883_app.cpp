@@ -139,11 +139,17 @@ HMC5883_InitPipe_Exit_Tag:
 void HMC5883::InitData()
 {
     /* Init housekeeping message. */
-    CFE_SB_InitMsg(&HkTlm,
-    		HMC5883_HK_TLM_MID, sizeof(HkTlm), TRUE);
-      /* Init output messages */
-      CFE_SB_InitMsg(&SensorMagMsg,
-      		PX4_SENSOR_MAG_MID, sizeof(PX4_SensorMagMsg_t), TRUE);
+    CFE_SB_InitMsg(&HkTlm, HMC5883_HK_TLM_MID, sizeof(HkTlm), TRUE);
+    /* Init output messages */
+    CFE_SB_InitMsg(&SensorMagMsg, PX4_SENSOR_MAG_MID, 
+            sizeof(PX4_SensorMagMsg_t), TRUE);
+    /* Set initial values for calibration */
+    HkTlm.Calibration.x_scale  = 1.0f;
+    HkTlm.Calibration.y_scale  = 1.0f;
+    HkTlm.Calibration.z_scale  = 1.0f;
+    HkTlm.Calibration.x_offset = 0.0f;
+    HkTlm.Calibration.y_offset = 0.0f;
+    HkTlm.Calibration.z_offset = 0.0f;
 }
 
 
@@ -175,12 +181,6 @@ int32 HMC5883::InitApp()
     }
 
     InitData();
-
-    iStatus = InitConfigTbl();
-    if (iStatus != CFE_SUCCESS)
-    {
-        goto HMC5883_InitApp_Exit_Tag;
-    }
 
 HMC5883_InitApp_Exit_Tag:
     if (iStatus == CFE_SUCCESS)
@@ -320,7 +320,7 @@ void HMC5883::ProcessCmdPipe()
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                 */
-/* Process HMC5883 Commands                                            */
+/* Process HMC5883 Commands                                        */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -359,7 +359,7 @@ void HMC5883::ProcessAppCmds(CFE_SB_Msg_t* MsgPtr)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                 */
-/* Send HMC5883 Housekeeping                                           */
+/* Send HMC5883 Housekeeping                                       */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -417,7 +417,7 @@ boolean HMC5883::VerifyCmdLength(CFE_SB_Msg_t* MsgPtr,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                 */
-/* HMC5883 Application C style main entry point.                       */
+/* HMC5883 Application C style main entry point.                   */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 extern "C" void HMC5883_AppMain()
@@ -428,7 +428,7 @@ extern "C" void HMC5883_AppMain()
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                 */
-/* HMC5883 Application C++ style main entry point.                     */
+/* HMC5883 Application C++ style main entry point.                 */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 void HMC5883::AppMain()
@@ -483,7 +483,17 @@ void HMC5883::AppMain()
     CFE_ES_ExitApp(uiRunStatus);
 }
 
+void HMC5883::ReadDevice(void)
+{
+    CFE_TIME_SysTime_t cfeTimeStamp = {0, 0};
+    
 
+    cfeTimeStamp = HMC5883_Custom_Get_Time();
+    
+    /* Timestamp */
+    SensorMag.Timestamp.Seconds = cfeTimeStamp.Seconds;
+    SensorMag.Timestamp.Subseconds = cfeTimeStamp.Subseconds;
+}
 /************************/
 /*  End of File Comment */
 /************************/

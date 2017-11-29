@@ -296,26 +296,6 @@ void Test_HMC5883_InitApp_Fail_InitData(void)
 
 
 /**
- * Test HMC5883_InitApp(), fail init config table
- */
-void Test_HMC5883_InitApp_Fail_InitConfigTbl(void)
-{
-    HMC5883 oHMC5883;
-
-    int32 result = CFE_SUCCESS;
-    int32 expected = CFE_TBL_ERR_INVALID_NAME;
-
-    Ut_CFE_TBL_SetReturnCode(UT_CFE_TBL_REGISTER_INDEX, expected, 1);
-
-    /* Execute the function being tested */
-    result = oHMC5883.InitApp();
-
-    /* Verify results */
-    UtAssert_True (result == expected, "InitApp, fail init config table");
-}
-
-
-/**
  * Test HMC5883_InitApp(), Nominal
  */
 void Test_HMC5883_InitApp_Nominal(void)
@@ -361,21 +341,6 @@ void Test_HMC5883_AppMain_Fail_InitApp(void)
 
     /* fail the register app */
     Ut_CFE_EVS_SetReturnCode(UT_CFE_EVS_REGISTER_INDEX, CFE_EVS_APP_NOT_REGISTERED, 1);
-
-    /* Execute the function being tested */
-    oHMC5883.AppMain();
-}
-
-
-/**
- * Test HMC5883_AppMain(), Fail AcquireConfigPtrs
- */
-void Test_HMC5883_AppMain_Fail_AcquireConfigPtrs(void)
-{
-    HMC5883 oHMC5883;
-
-    /* fail the register app */
-    Ut_CFE_TBL_SetReturnCode(UT_CFE_TBL_GETADDRESS_INDEX, CFE_TBL_ERR_INVALID_HANDLE, 2);
 
     /* Execute the function being tested */
     oHMC5883.AppMain();
@@ -489,8 +454,6 @@ void HMC5883_App_Test_AddTestCases(void)
                "Test_HMC5883_InitApp_Fail_InitPipe");
     UtTest_Add(Test_HMC5883_InitApp_Fail_InitData, HMC5883_Test_Setup, HMC5883_Test_TearDown,
                "Test_HMC5883_InitApp_Fail_InitData");
-    UtTest_Add(Test_HMC5883_InitApp_Fail_InitConfigTbl, HMC5883_Test_Setup, HMC5883_Test_TearDown,
-               "Test_HMC5883_InitApp_Fail_InitConfigTbl");
     UtTest_Add(Test_HMC5883_InitApp_Nominal, HMC5883_Test_Setup, HMC5883_Test_TearDown,
                "Test_HMC5883_InitApp_Nominal");
 
@@ -498,8 +461,6 @@ void HMC5883_App_Test_AddTestCases(void)
                "Test_HMC5883_AppMain_Fail_RegisterApp");
     UtTest_Add(Test_HMC5883_AppMain_Fail_InitApp, HMC5883_Test_Setup, HMC5883_Test_TearDown,
                "Test_HMC5883_AppMain_Fail_InitApp");
-    UtTest_Add(Test_HMC5883_AppMain_Fail_AcquireConfigPtrs, HMC5883_Test_Setup, HMC5883_Test_TearDown,
-               "Test_HMC5883_AppMain_Fail_AcquireConfigPtrs");
     UtTest_Add(Test_HMC5883_AppMain_InvalidSchMessage, HMC5883_Test_Setup, HMC5883_Test_TearDown,
                "Test_HMC5883_AppMain_InvalidSchMessage");
     UtTest_Add(Test_HMC5883_AppMain_Nominal_SendHK, HMC5883_Test_Setup, HMC5883_Test_TearDown,

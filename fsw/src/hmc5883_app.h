@@ -53,7 +53,6 @@ extern "C" {
 #include "hmc5883_msgids.h"
 #include "hmc5883_msg.h"
 #include "hmc5883_events.h"
-#include "hmc5883_tbldefs.h"
 #include "px4_msgs.h"
 /************************************************************************
  ** Local Defines
@@ -84,13 +83,6 @@ public:
     /** \brief Task Run Status */
     uint32 uiRunStatus;
 
-    /* Config table-related */
-
-    /** \brief Config Table Handle */
-    CFE_TBL_Handle_t ConfigTblHdl;
-
-    /** \brief Config Table Pointer */
-    HMC5883_ConfigTbl_t* ConfigTblPtr;
     /** \brief Output Data published at the end of cycle */
     PX4_SensorMagMsg_t SensorMagMsg;
 
@@ -283,63 +275,6 @@ public:
      **
      *************************************************************************/
     boolean VerifyCmdLength(CFE_SB_Msg_t* MsgPtr, uint16 usExpectedLen);
-
-private:
-    /************************************************************************/
-    /** \brief Initialize the HMC5883 configuration tables.
-    **
-    **  \par Description
-    **       This function initializes HMC5883's configuration tables.  This
-    **       includes <TODO>.
-    **
-    **  \par Assumptions, External Events, and Notes:
-    **       None
-    **
-    **  \returns
-    **  \retcode #CFE_SUCCESS  \retdesc \copydoc CFE_SUCCESS  \endcode
-    **  \retstmt Return codes from #CFE_TBL_Register          \endcode
-    **  \retstmt Return codes from #CFE_TBL_Load              \endcode
-    **  \retstmt Return codes from #HMC5883_AcquireConfigPointers \endcode
-    **  \endreturns
-    **
-    *************************************************************************/
-    int32  InitConfigTbl(void);
-
-    /************************************************************************/
-    /** \brief Obtain HMC5883 configuration tables data pointers.
-    **
-    **  \par Description
-    **       This function manages the configuration tables
-    **       and obtains a pointer to their data.
-    **
-    **  \par Assumptions, External Events, and Notes:
-    **       None
-    **
-    **  \returns
-    **  \retcode #CFE_SUCCESS  \retdesc \copydoc CFE_SUCCESS  \endcode
-    **  \endreturns
-    **
-    *************************************************************************/
-    int32  AcquireConfigPointers(void);
-
-public:
-    /************************************************************************/
-    /** \brief Validate HMC5883 configuration table
-    **
-    **  \par Description
-    **       This function validates HMC5883's configuration table
-    **
-    **  \par Assumptions, External Events, and Notes:
-    **       None
-    **
-    **  \param [in]   ConfigTblPtr    A pointer to the table to validate.
-    **
-    **  \returns
-    **  \retcode #CFE_SUCCESS  \retdesc \copydoc CFE_SUCCESS  \endcode
-    **  \endreturns
-    **
-    *************************************************************************/
-    static int32  ValidateConfigTbl(void*);
 };
 
 #ifdef __cplusplus

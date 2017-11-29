@@ -34,13 +34,11 @@
 #include "uttest.h"
 #include "hmc5883_app_test.h"
 #include "hmc5883_cmds_test.h"
-#include "hmc5883_config_tbl_test.h"
 
 int main(void)
 {   
     HMC5883_App_Test_AddTestCases();
     HMC5883_Cmds_Test_AddTestCases();
-    HMC5883_Config_Tbl_Test_AddTestCases();
 
     return(UtTest_Run());
 
