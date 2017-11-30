@@ -33,6 +33,7 @@
 
 #include "hmc5883_custom_stubs.h"
 
+
 void HMC5883_Custom_InitData(void)
 {
     
