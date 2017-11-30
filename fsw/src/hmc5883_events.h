@@ -249,6 +249,54 @@ typedef enum {
 **
 */
 	HMC5883_CFGTBL_LOAD_ERR_EID,
+/** \brief <tt> 'HMC5883 - ' </tt>
+**  \event <tt> 'HMC5883 - ' </tt>
+**  
+**  \par Type: ERROR
+**
+**  \par Cause:
+**
+**  This event message is issued when MPU9250 has
+**  had an error in uninitialization.
+**
+*/
+    HMC5883_UNINIT_ERR_EID,
+/** \brief <tt> 'HMC5883 - ' </tt>
+**  \event <tt> 'HMC5883 - ' </tt>
+**  
+**  \par Type: ERROR
+**
+**  \par Cause:
+**
+**  This event message is issued when the MPU9250 has
+**  had an error in initialization.
+**
+*/
+    HMC5883_INIT_ERR_EID,
+/** \brief <tt> 'Failed to read device' </tt>
+**  \event <tt> 'Failed to read device' </tt>
+**
+**  \par Type: ERROR
+**
+**  \par Cause:
+**
+**  This event message is issued when a device read error occurs.
+**
+**
+*/
+    HMC5883_READ_ERR_EID,
+/** \brief <tt> 'Failed to validate device' </tt>
+**  \event <tt> 'Failed to validate device' </tt>
+**
+**  \par Type: ERROR
+**
+**  \par Cause:
+**
+**  This event message is issued when a device ID isn't as expected.
+**
+**
+*/
+    HMC5883_VALIDATE_ERR_EID,
 
 /** \brief <tt> This is a count of all the app events and should not be used. </tt> */
 	HMC5883_EVT_CNT

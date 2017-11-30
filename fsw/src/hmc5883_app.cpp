@@ -5,6 +5,7 @@
 
 #include "cfe.h"
 
+#include "hmc5883_custom.h"
 #include "hmc5883_app.h"
 #include "hmc5883_msg.h"
 #include "hmc5883_version.h"
@@ -48,13 +49,42 @@ HMC5883::~HMC5883()
 int32 HMC5883::InitEvent()
 {
     int32  iStatus=CFE_SUCCESS;
+    int32  ind = 0;
+    int32 customEventCount = 0;
+    
+    CFE_EVS_BinFilter_t   EventTbl[CFE_EVS_MAX_EVENT_FILTERS];
+
+    /* Initialize the event filter table.
+     * Note: 0 is the CFE_EVS_NO_FILTER mask and event 0 is reserved (not used) */
+    memset(EventTbl, 0x00, sizeof(EventTbl));
+    
+    /* TODO: Choose the events you want to filter.  CFE_EVS_MAX_EVENT_FILTERS
+     * limits the number of filters per app.  An explicit CFE_EVS_NO_FILTER 
+     * (the default) has been provided as an example. */
+    EventTbl[  ind].EventID = HMC5883_RESERVED_EID;
+    EventTbl[ind++].Mask    = CFE_EVS_NO_FILTER;
+    EventTbl[  ind].EventID = HMC5883_READ_ERR_EID;
+    EventTbl[ind++].Mask    = CFE_EVS_FIRST_16_STOP;
+    
+    
+    /* Add custom events to the filter table */
+    customEventCount = HMC5883_Custom_Init_EventFilters(ind, EventTbl);
+    
+    if(-1 == customEventCount)
+    {
+        iStatus = CFE_EVS_APP_FILTER_OVERLOAD;
+        (void) CFE_ES_WriteToSysLog("Failed to init custom event filters (0x%08X)\n", (unsigned int)iStatus);
+        goto end_of_function;
+    }
 
     /* Register the table with CFE */
-    iStatus = CFE_EVS_Register(0, 0, CFE_EVS_BINARY_FILTER);
+    iStatus = CFE_EVS_Register(EventTbl, (ind + customEventCount), CFE_EVS_BINARY_FILTER);
     if (iStatus != CFE_SUCCESS)
     {
         (void) CFE_ES_WriteToSysLog("HMC5883 - Failed to register with EVS (0x%08lX)\n", iStatus);
     }
+
+end_of_function:
 
     return iStatus;
 }
@@ -162,6 +192,7 @@ int32 HMC5883::InitApp()
 {
     int32  iStatus   = CFE_SUCCESS;
     int8   hasEvents = 0;
+    boolean returnBool = TRUE;
 
     iStatus = InitEvent();
     if (iStatus != CFE_SUCCESS)
@@ -181,6 +212,14 @@ int32 HMC5883::InitApp()
     }
 
     InitData();
+    returnBool = HMC5883_Custom_Init();
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+                "Custom init failed");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
 
 HMC5883_InitApp_Exit_Tag:
     if (iStatus == CFE_SUCCESS)
@@ -469,13 +508,6 @@ void HMC5883::AppMain()
     while (CFE_ES_RunLoop(&uiRunStatus) == TRUE)
     {
         RcvSchPipeMsg(HMC5883_SCH_PIPE_PEND_TIME);
-
-        iStatus = AcquireConfigPointers();
-        if(iStatus != CFE_SUCCESS)
-        {
-            /* We apparently tried to load a new table but failed.  Terminate the application. */
-            uiRunStatus = CFE_ES_APP_ERROR;
-        }
     }
 
     /* Stop Performance Log entry */
@@ -488,6 +520,7 @@ void HMC5883::AppMain()
 
 void HMC5883::ReadDevice(void)
 {
+    boolean returnBool = FALSE;
     float rawX_f = 0;
     float rawY_f = 0;
     float rawZ_f = 0;
@@ -498,11 +531,11 @@ void HMC5883::ReadDevice(void)
     cfeTimeStamp = HMC5883_Custom_Get_Time();
     
     /* Timestamp */
-    SensorMag.Timestamp.Seconds = cfeTimeStamp.Seconds;
-    SensorMag.Timestamp.Subseconds = cfeTimeStamp.Subseconds;
+    SensorMagMsg.Timestamp.Seconds = cfeTimeStamp.Seconds;
+    SensorMagMsg.Timestamp.Subseconds = cfeTimeStamp.Subseconds;
 
     /* Mag */
-    returnBool = HMC5883_Custom_Measure(&SensorMag.XRaw, &SensorMag.YRaw, &SensorMag.ZRaw);
+    returnBool = HMC5883_Custom_Measure(&SensorMagMsg.XRaw, &SensorMagMsg.YRaw, &SensorMagMsg.ZRaw);
     if(FALSE == returnBool)
     {
         goto end_of_function;
@@ -511,19 +544,29 @@ void HMC5883::ReadDevice(void)
     /* The standard external mag by 3DR has x pointing to the
      * right, y pointing backwards, and z down, therefore switch x
      * and y and invert y. */
-    temp_f = SensorMag.XRaw;
-    SensorMag.XRaw = -SensorMag.YRaw;
-    SensorMag.YRaw = temp_f;
-    
+    temp_f = SensorMagMsg.XRaw;
+    SensorMagMsg.XRaw = -SensorMagMsg.YRaw;
+    SensorMagMsg.YRaw = temp_f;
     
     /* Set range */
-    SensorMag.Range = 1.3f;
+    SensorMagMsg.Range = 1.3f;
     
     /* Set scale */
-    SensorMag.Scale = 1.0f / 1090.0f;
+    SensorMagMsg.Scaling = 1.0f / 1090.0f;
     
 end_of_function:
 ;
+}
+
+
+void HMC5883_CleanupCallback(void)
+{
+    oHMC5883.HkTlm.State = HMC5883_UNINITIALIZED;
+    if(HMC5883_Custom_Uninit() != TRUE)
+    {
+        CFE_EVS_SendEvent(HMC5883_UNINIT_ERR_EID, CFE_EVS_ERROR,"HMC5883_Uninit failed");
+        oHMC5883.HkTlm.State = HMC5883_INITIALIZED;
+    }
 }
 /************************/
 /*  End of File Comment */

@@ -164,6 +164,8 @@ typedef struct
     uint8              usCmdErrCnt; 
     /** \brief Current HMC5883 calibration values */
     HMC5883_Calibration_t   Calibration;
+    /** \brief App State */
+    uint8              State;
 } HMC5883_HkTlm_t;
 
 

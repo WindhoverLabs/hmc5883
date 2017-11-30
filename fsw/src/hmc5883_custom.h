@@ -154,7 +154,7 @@ boolean HMC5883_Custom_Measure(int16 *X, int16 *Y, int16 *Z);
 **  \returns    CFE_TIME_SysTime_t
 **
 *************************************************************************/
-CFE_TIME_SysTime_t MPU9250_Custom_Get_Time(void);
+CFE_TIME_SysTime_t HMC5883_Custom_Get_Time(void);
 
 
 #ifdef __cplusplus

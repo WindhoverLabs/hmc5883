@@ -61,6 +61,16 @@ extern "C" {
 /************************************************************************
  ** Local Structure Definitions
  *************************************************************************/
+/**
+ * \brief application status
+ */
+typedef enum
+{
+    /*! App status uninitialized */
+    HMC5883_UNINITIALIZED = 0,
+    /*! App status uninitialized */
+    HMC5883_INITIALIZED   = 1
+} HMC5883_Status_t;
 
 
 /**
@@ -277,7 +287,35 @@ public:
      **
      *************************************************************************/
     boolean VerifyCmdLength(CFE_SB_Msg_t* MsgPtr, uint16 usExpectedLen);
+    
+    /************************************************************************/
+    /** \brief Read from the HMC5883.
+     **
+     **  \par Description
+     **       This function populates values in the associated PX4 
+     **       message.
+     **       <TODO>
+     **
+     **  \par Assumptions, External Events, and Notes:
+     **       None
+     **
+     *************************************************************************/
+    void ReadDevice(void);
 };
+
+
+/************************************************************************/
+/** \brief Cleanup prior to exit
+**
+**  \par Description
+**       This function handles any necessary cleanup prior
+**       to application exit.
+**
+**  \par Assumptions, External Events, and Notes:
+**       None
+**
+*************************************************************************/
+void HMC5883_CleanupCallback(void);
 
 #ifdef __cplusplus
 }

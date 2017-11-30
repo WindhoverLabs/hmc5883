@@ -25,6 +25,8 @@ add_airliner_app_unit_test(hmc5883-ut
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_testrunner.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_test_utils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_test_utils.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_custom_stubs.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_custom_stubs.c
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_app.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_app.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_events.h
