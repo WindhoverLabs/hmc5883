@@ -4,10 +4,8 @@ add_airliner_app_def(hmc5883
     SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_app.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_app.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_config_utils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_events.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_msg.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_tbldefs.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_version.h
    
     INCLUDES
@@ -24,17 +22,13 @@ add_airliner_app_unit_test(hmc5883-ut
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_app_test.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_cmds_test.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_cmds_test.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_config_tbl_test.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_config_tbl_test.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_testrunner.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_test_utils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../unit_test/hmc5883_test_utils.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_app.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_app.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_config_utils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_events.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_msg.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_tbldefs.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_version.h
         
     INCLUDES

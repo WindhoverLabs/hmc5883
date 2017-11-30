@@ -231,6 +231,8 @@ int32 HMC5883::RcvSchPipeMsg(int32 iBlocking)
         switch (MsgId)
         {
             case HMC5883_WAKEUP_MID:
+                ReadDevice();
+                SendSensorMagMsg();
                 /* TODO:  Do something here. */
                 break;
 
@@ -483,8 +485,13 @@ void HMC5883::AppMain()
     CFE_ES_ExitApp(uiRunStatus);
 }
 
+
 void HMC5883::ReadDevice(void)
 {
+    float rawX_f = 0;
+    float rawY_f = 0;
+    float rawZ_f = 0;
+    float temp_f = 0;
     CFE_TIME_SysTime_t cfeTimeStamp = {0, 0};
     
 
@@ -493,6 +500,30 @@ void HMC5883::ReadDevice(void)
     /* Timestamp */
     SensorMag.Timestamp.Seconds = cfeTimeStamp.Seconds;
     SensorMag.Timestamp.Subseconds = cfeTimeStamp.Subseconds;
+
+    /* Mag */
+    returnBool = HMC5883_Custom_Measure(&SensorMag.XRaw, &SensorMag.YRaw, &SensorMag.ZRaw);
+    if(FALSE == returnBool)
+    {
+        goto end_of_function;
+    }
+    
+    /* The standard external mag by 3DR has x pointing to the
+     * right, y pointing backwards, and z down, therefore switch x
+     * and y and invert y. */
+    temp_f = SensorMag.XRaw;
+    SensorMag.XRaw = -SensorMag.YRaw;
+    SensorMag.YRaw = temp_f;
+    
+    
+    /* Set range */
+    SensorMag.Range = 1.3f;
+    
+    /* Set scale */
+    SensorMag.Scale = 1.0f / 1090.0f;
+    
+end_of_function:
+;
 }
 /************************/
 /*  End of File Comment */
