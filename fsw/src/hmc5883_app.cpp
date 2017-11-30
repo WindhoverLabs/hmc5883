@@ -173,6 +173,8 @@ void HMC5883::InitData()
     /* Init output messages */
     CFE_SB_InitMsg(&SensorMagMsg, PX4_SENSOR_MAG_MID, 
             sizeof(PX4_SensorMagMsg_t), TRUE);
+    /* Init custom data */
+    HMC5883_Custom_InitData();
     /* Set initial values for calibration */
     HkTlm.Calibration.x_scale  = 1.0f;
     HkTlm.Calibration.y_scale  = 1.0f;
@@ -547,6 +549,11 @@ void HMC5883::ReadDevice(void)
     temp_f = SensorMagMsg.XRaw;
     SensorMagMsg.XRaw = -SensorMagMsg.YRaw;
     SensorMagMsg.YRaw = temp_f;
+    
+    /* Set calibrated values */
+    SensorMagMsg.X = (SensorMagMsg.XRaw - HkTlm.Calibration.x_offset) * HkTlm.Calibration.x_scale;
+    SensorMagMsg.Y = (SensorMagMsg.YRaw - HkTlm.Calibration.y_offset) * HkTlm.Calibration.y_scale;
+    SensorMagMsg.Z = (SensorMagMsg.ZRaw - HkTlm.Calibration.z_offset) * HkTlm.Calibration.z_scale;
     
     /* Set range */
     SensorMagMsg.Range = 1.3f;

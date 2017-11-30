@@ -161,4 +161,4 @@ CFE_TIME_SysTime_t HMC5883_Custom_Get_Time(void);
 }
 #endif 
 
-#endif /* RGBLED_CUSTOM_H */
+#endif /* HMC5883_CUSTOM_H */
