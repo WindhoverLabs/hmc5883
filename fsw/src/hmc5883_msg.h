@@ -166,6 +166,10 @@ typedef struct
     HMC5883_Calibration_t   Calibration;
     /** \brief App State */
     uint8              State;
+    /** \brief Current range value */
+    float              Range;
+    /** \brief Current scale value */
+    float              Scaling;
 } HMC5883_HkTlm_t;
 
 

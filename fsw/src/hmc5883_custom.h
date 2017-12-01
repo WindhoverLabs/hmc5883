@@ -40,6 +40,7 @@
 /************************************************************************
 ** Includes
 *************************************************************************/
+#include "hmc5883_msg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,6 +118,10 @@ boolean HMC5883_Custom_Uninit(void);
 **       This function must be defined, but not all custom
 **       layers will do anything in this function.
 **
+**  \param [in]   ind       The current event table index.
+**
+**  \param [out]  EventTbl  The current event table to modify.
+**
 **  \returns
 **       The number of events written to the filter table and -1 for 
 **       failure i.e. CFE_EVS_MAX_EVENT_FILTERS reached.
@@ -156,6 +161,112 @@ boolean HMC5883_Custom_Measure(int16 *X, int16 *Y, int16 *Z);
 *************************************************************************/
 CFE_TIME_SysTime_t HMC5883_Custom_Get_Time(void);
 
+
+/************************************************************************/
+/** \brief Apply any required rotation of the sensor x, y, and z axis.
+**
+**  \par Description
+**       This function will apply rotation to match the orientation
+**       of the sensor on the vehicle.
+**
+**  \param [out]    X    Raw X value.
+**
+**  \param [out]    Y    Raw Y value.
+**
+**  \param [out]    Z    Raw Z value.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Apply_Platform_Rotation(int16 *X, int16 *Y, int16 *Z);
+
+
+/************************************************************************/
+/** \brief Validate the device ID.
+**
+**  \par Description
+**       This function will complete a "who am i" check of the device.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_ValidateID(void);
+
+
+/************************************************************************/
+/** \brief Run the self calibration routine.
+**
+**  \par Description
+**       This function uses the device built in self test to create a
+**       bias for calibration.
+**
+**  \param [out]    Calibration    The calibration result.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_Calibration(HMC5883_Calibration_t *Calibration);
+
+
+/************************************************************************/
+/** \brief Set the sensor field range (gain).
+**
+**  \par Description
+**       This function sets the configuration register B gain
+**       gain configuration bits.
+**
+**  \param [in]    Range   The desired bit mask.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_Set_Range(uint8 Range);
+
+
+/************************************************************************/
+/** \brief Check the value of the sensor field range (gain).
+**
+**  \par Description
+**       This function checks and if the value isn't found sets the 
+**       configuration register B gain gain configuration bits.
+**
+**  \param [in]    Range   The desired bit mask to check.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_Check_Range(uint8 Range);
+
+
+/************************************************************************/
+/** \brief Set the sensor configuration.
+**
+**  \par Description
+**       This function sets the configuration register A for data 
+**       output rate and measurement configuration.
+**
+**  \param [in]    Range   The desired bit mask.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_Check_Config(uint8 Config);
+
+
+/************************************************************************/
+/** \brief Check the value of the sensor configuration.
+**
+**  \par Description
+**       This function checks and if the value isn't found sets the
+**       configuration register A for data output rate and
+**       measurement configuration.
+**
+**  \param [in]    Range   The desired bit mask to check.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_Set_Config(uint8 Config);
 
 #ifdef __cplusplus
 }

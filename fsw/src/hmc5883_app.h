@@ -58,6 +58,13 @@ extern "C" {
 /************************************************************************
  ** Local Defines
  *************************************************************************/
+/** \brief Gain setting default.
+**
+**  \par Description:
+**       Gain setting Recommended Sensor Field Range +- 1.3 Ga,
+**       Gain (LSb/Gauss) 1090, Digital Resoluation (mG/LSb) 0.92.
+*/
+#define HMC5883_BITS_CONFIG_B_RANGE_1GA3          (0x01 << 5)
 
 /************************************************************************
  ** Local Structure Definitions

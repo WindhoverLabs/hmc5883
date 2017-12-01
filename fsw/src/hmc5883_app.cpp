@@ -182,12 +182,14 @@ void HMC5883::InitData()
     HkTlm.Calibration.x_offset = 0.0f;
     HkTlm.Calibration.y_offset = 0.0f;
     HkTlm.Calibration.z_offset = 0.0f;
+    HkTlm.Range                = 1.3f;
+    HkTlm.Scaling              = 1.0f / 1090.0f;
 }
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                 */
-/* HMC5883 initialization                                              */
+/* HMC5883 initialization                                          */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int32 HMC5883::InitApp()
@@ -222,16 +224,40 @@ int32 HMC5883::InitApp()
                 "Custom init failed");
         goto HMC5883_InitApp_Exit_Tag;
     }
+    returnBool = HMC5883_Custom_ValidateID();
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed validate ID");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
+    returnBool = HMC5883_Custom_Calibration(&HkTlm.Calibration);
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed calibration");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
+    returnBool = HMC5883_Custom_Set_Range(HMC5883_BITS_CONFIG_B_RANGE_1GA3);
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed set range");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
 
 HMC5883_InitApp_Exit_Tag:
     if (iStatus == CFE_SUCCESS)
     {
         (void) CFE_EVS_SendEvent(HMC5883_INIT_INF_EID, CFE_EVS_INFORMATION,
-                                 "Initialized.  Version %d.%d.%d.%d",
-								 HMC5883_MAJOR_VERSION,
-								 HMC5883_MINOR_VERSION,
-								 HMC5883_REVISION,
-								 HMC5883_MISSION_REV);
+                                "Initialized.  Version %d.%d.%d.%d",
+                                HMC5883_MAJOR_VERSION,
+                                HMC5883_MINOR_VERSION,
+                                HMC5883_REVISION,
+                                HMC5883_MISSION_REV);
     }
     else
     {
@@ -284,7 +310,7 @@ int32 HMC5883::RcvSchPipeMsg(int32 iBlocking)
 
             default:
                 (void) CFE_EVS_SendEvent(HMC5883_MSGID_ERR_EID, CFE_EVS_ERROR,
-                     "Recvd invalid SCH msgId (0x%04X)", MsgId);
+                    "Recvd invalid SCH msgId (0x%04X)", MsgId);
         }
     }
     else if (iStatus == CFE_SB_NO_MESSAGE)
@@ -305,7 +331,7 @@ int32 HMC5883::RcvSchPipeMsg(int32 iBlocking)
     else
     {
         (void) CFE_EVS_SendEvent(HMC5883_RCVMSG_ERR_EID, CFE_EVS_ERROR,
-			  "SCH pipe read error (0x%08lX).", iStatus);
+            "SCH pipe read error (0x%08lX).", iStatus);
     }
 
     return iStatus;
@@ -379,11 +405,11 @@ void HMC5883::ProcessAppCmds(CFE_SB_Msg_t* MsgPtr)
             case HMC5883_NOOP_CC:
                 HkTlm.usCmdCnt++;
                 (void) CFE_EVS_SendEvent(HMC5883_CMD_NOOP_EID, CFE_EVS_INFORMATION,
-					"Recvd NOOP. Version %d.%d.%d.%d",
-					HMC5883_MAJOR_VERSION,
-					HMC5883_MINOR_VERSION,
-					HMC5883_REVISION,
-					HMC5883_MISSION_REV);
+                    "Recvd NOOP. Version %d.%d.%d.%d",
+                    HMC5883_MAJOR_VERSION,
+                    HMC5883_MINOR_VERSION,
+                    HMC5883_REVISION,
+                    HMC5883_MISSION_REV);
                 break;
 
             case HMC5883_RESET_CC:
@@ -526,9 +552,7 @@ void HMC5883::ReadDevice(void)
     float rawX_f = 0;
     float rawY_f = 0;
     float rawZ_f = 0;
-    float temp_f = 0;
     CFE_TIME_SysTime_t cfeTimeStamp = {0, 0};
-    
 
     cfeTimeStamp = HMC5883_Custom_Get_Time();
     
@@ -543,23 +567,23 @@ void HMC5883::ReadDevice(void)
         goto end_of_function;
     }
     
-    /* The standard external mag by 3DR has x pointing to the
-     * right, y pointing backwards, and z down, therefore switch x
-     * and y and invert y. */
-    temp_f = SensorMagMsg.XRaw;
-    SensorMagMsg.XRaw = -SensorMagMsg.YRaw;
-    SensorMagMsg.YRaw = temp_f;
-    
+    /* Apply any rotation */
+    returnBool = HMC5883_Apply_Platform_Rotation(&SensorMagMsg.XRaw, &SensorMagMsg.YRaw, &SensorMagMsg.ZRaw);
+    if(FALSE == returnBool)
+    {
+        goto end_of_function;
+    }
+
     /* Set calibrated values */
     SensorMagMsg.X = (SensorMagMsg.XRaw - HkTlm.Calibration.x_offset) * HkTlm.Calibration.x_scale;
     SensorMagMsg.Y = (SensorMagMsg.YRaw - HkTlm.Calibration.y_offset) * HkTlm.Calibration.y_scale;
     SensorMagMsg.Z = (SensorMagMsg.ZRaw - HkTlm.Calibration.z_offset) * HkTlm.Calibration.z_scale;
     
     /* Set range */
-    SensorMagMsg.Range = 1.3f;
+    SensorMagMsg.Range = HkTlm.Range;
     
     /* Set scale */
-    SensorMagMsg.Scaling = 1.0f / 1090.0f;
+    SensorMagMsg.Scaling = HkTlm.Scaling;
     
 end_of_function:
 ;

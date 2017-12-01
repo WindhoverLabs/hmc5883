@@ -33,6 +33,16 @@
 
 #include "hmc5883_custom_stubs.h"
 
+typedef struct
+{
+    float                   x_scale;
+    float                   y_scale;
+    float                   z_scale;
+    float                   x_offset;
+    float                   y_offset;
+    float                   z_offset;
+} HMC5883_Calibration_t;
+
 
 void HMC5883_Custom_InitData(void)
 {
@@ -70,3 +80,44 @@ CFE_TIME_SysTime_t HMC5883_Custom_Get_Time(void)
     return time;
 }
 
+
+boolean HMC5883_Custom_ValidateID(void)
+{
+    return TRUE;
+}
+
+
+boolean HMC5883_Apply_Platform_Rotation(int16 *X, int16 *Y, int16 *Z)
+{
+    return TRUE;
+}
+
+
+boolean HMC5883_Custom_Calibration(HMC5883_Calibration_t *Calibration)
+{
+    return TRUE;
+}
+
+
+boolean HMC5883_Custom_Set_Config(uint8 Config)
+{
+    return TRUE;
+}
+
+
+boolean HMC5883_Custom_Check_Config(uint8 Config)
+{
+    return TRUE;
+}
+
+
+boolean HMC5883_Custom_Check_Range(uint8 Range)
+{
+    return TRUE;
+}
+
+
+boolean HMC5883_Custom_Set_Range(uint8 Range)
+{
+    return TRUE;
+}
