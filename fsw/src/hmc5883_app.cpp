@@ -233,6 +233,10 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed validate ID");
         goto HMC5883_InitApp_Exit_Tag;
     }
+    
+    /* TODO add self test*/
+
+    /* TODO self calibration routine */
     returnBool = HMC5883_Custom_Calibration(&HkTlm.Calibration);
     if (FALSE == returnBool)
     {
@@ -247,6 +251,14 @@ int32 HMC5883::InitApp()
         iStatus = -1;
         CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
             "HMC5883 Device failed set range");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
+    returnBool = HMC5883_Custom_Check_Range(HMC5883_BITS_CONFIG_B_RANGE_1GA3);
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed check range");
         goto HMC5883_InitApp_Exit_Tag;
     }
     
@@ -579,7 +591,7 @@ void HMC5883::ReadDevice(void)
     {
         goto end_of_function;
     }
-    
+
     /* Apply any rotation */
     returnBool = HMC5883_Apply_Platform_Rotation(&SensorMagMsg.XRaw, &SensorMagMsg.YRaw, &SensorMagMsg.ZRaw);
     if(FALSE == returnBool)
