@@ -33,6 +33,7 @@
 
 #include "hmc5883_custom_stubs.h"
 
+
 typedef struct
 {
     float                   x_scale;

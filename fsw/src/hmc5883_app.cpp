@@ -182,6 +182,7 @@ void HMC5883::InitData()
     HkTlm.Calibration.x_offset = 0.0f;
     HkTlm.Calibration.y_offset = 0.0f;
     HkTlm.Calibration.z_offset = 0.0f;
+    /* Set range and scale */
     HkTlm.Range                = 1.3f;
     HkTlm.Scaling              = 1.0f / 1090.0f;
 }
@@ -248,6 +249,16 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed set range");
         goto HMC5883_InitApp_Exit_Tag;
     }
+    
+    /* Register the cleanup callback */
+    iStatus = OS_TaskInstallDeleteHandler(&HMC5883_CleanupCallback);
+    if (iStatus != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+                                 "Failed to init register cleanup callback (0x%08X)",
+                                 (unsigned int)iStatus);
+        goto HMC5883_InitApp_Exit_Tag;
+    }
 
 HMC5883_InitApp_Exit_Tag:
     if (iStatus == CFE_SUCCESS)
@@ -258,6 +269,8 @@ HMC5883_InitApp_Exit_Tag:
                                 HMC5883_MINOR_VERSION,
                                 HMC5883_REVISION,
                                 HMC5883_MISSION_REV);
+        /* Set the app state to initialized */
+        oHMC5883.HkTlm.State = HMC5883_INITIALIZED;
     }
     else
     {
