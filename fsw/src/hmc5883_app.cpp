@@ -694,6 +694,7 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
         rangeSet = TRUE;
         goto end_of_function;
     }
+    /* Set the range scale to the range setting above */
     rangeScale = 1.0f / 660.0f;
     /* Set negative bias enable */
     config |= HMC5883_NEG_BIAS_ENABLE;
@@ -747,16 +748,19 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
         returnBool = FALSE;
         goto end_of_function;
     }
+
     /* Get the average */
     scaling[0] = sum_excited[0] / good_count;
     scaling[1] = sum_excited[1] / good_count;
     scaling[2] = sum_excited[2] / good_count;
+
     /* Apply platform rotation to the calibration scale factors */
     returnBool = HMC5883_Apply_Platform_Rotation_Float(&scaling[0], &scaling[1], &scaling[2]);
     if(FALSE == returnBool)
     {
         goto end_of_function;
     }
+
     /* Sanity check scale values */
     returnBool = CheckScale(scaling[0], scaling[1], scaling[2]);
     if (TRUE == returnBool)
@@ -775,7 +779,8 @@ end_of_function:
         HMC5883_Custom_Set_Range(range);
     }
     if (TRUE == configSet)
-    {
+    {   
+        /* return the configuration setting back to normal */
         HMC5883_Custom_Set_Config(config);
     }
     return returnBool;
