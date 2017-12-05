@@ -310,6 +310,19 @@ typedef enum {
 **
 */
     HMC5883_SCALE_ERR_EID,
+/** \brief <tt> 'Failed to validate offset' </tt>
+**  \event <tt> 'Failed to validate offset' </tt>
+**
+**  \par Type: ERROR
+**
+**  \par Cause:
+**
+**  This event message is issued when the offset calibration fails 
+**  validation.
+**
+**
+*/
+    HMC5883_OFFSET_ERR_EID,
 
 /** \brief <tt> This is a count of all the app events and should not be used. </tt> */
 	HMC5883_EVT_CNT

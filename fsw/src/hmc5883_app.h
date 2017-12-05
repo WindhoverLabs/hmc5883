@@ -367,8 +367,28 @@ public:
     **
     *************************************************************************/
     boolean EnableTempCompensation(void);
-    
+
+    /************************************************************************/
+    /** \brief Validate scale values.
+    **
+    **  \par Description
+    **       Sanity check scale values.
+    **
+    **  \returns    TRUE for valid, FALSE for invalid.
+    **
+    *************************************************************************/
     boolean CheckScale(float X, float Y, float Z);
+    
+    /************************************************************************/
+    /** \brief Validate offset values.
+    **
+    **  \par Description
+    **       Sanity check offset values.
+    **
+    **  \returns    TRUE for valid, FALSE for invalid.
+    **
+    *************************************************************************/
+    boolean CheckOffset(float X, float Y, float Z);
 };
 
 

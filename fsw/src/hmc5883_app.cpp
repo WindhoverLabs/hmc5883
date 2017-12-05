@@ -607,18 +607,21 @@ void HMC5883::ReadDevice(void)
     }
 
     /* Set calibrated values */
-    SensorMagMsg.X = (SensorMagMsg.XRaw - HkTlm.Calibration.x_offset) * HkTlm.Calibration.x_scale;
-    SensorMagMsg.Y = (SensorMagMsg.YRaw - HkTlm.Calibration.y_offset) * HkTlm.Calibration.y_scale;
-    SensorMagMsg.Z = (SensorMagMsg.ZRaw - HkTlm.Calibration.z_offset) * HkTlm.Calibration.z_scale;
-    
+    SensorMagMsg.X = ((SensorMagMsg.XRaw * HkTlm.Scaling) - 
+            HkTlm.Calibration.x_offset) * HkTlm.Calibration.x_scale;
+    SensorMagMsg.Y = ((SensorMagMsg.YRaw * HkTlm.Scaling) - 
+            HkTlm.Calibration.y_offset) * HkTlm.Calibration.y_scale;
+    SensorMagMsg.Z = ((SensorMagMsg.ZRaw * HkTlm.Scaling) - 
+            HkTlm.Calibration.z_offset) * HkTlm.Calibration.z_scale;
+
     /* Set range */
     SensorMagMsg.Range = HkTlm.Range;
     
     /* Set scale */
     SensorMagMsg.Scaling = HkTlm.Scaling;
     
-    /* Measure temperature every 100 mag samples */
-    if(temp_count == 100)
+    /* Measure temperature every 10 mag samples */
+    if(temp_count == 10)
     {
         returnBool = HMC5883_Custom_Measure_Temp(&temp);
         if(FALSE == returnBool)
@@ -627,7 +630,6 @@ void HMC5883::ReadDevice(void)
         }
         
         SensorMagMsg.Temperature = 25 + (temp / (16 * 8.0f));
-        OS_printf("HMC5983 temp = %f\n", SensorMagMsg.Temperature);
         temp_count = 0;
     }
     else
@@ -649,6 +651,7 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
     int16 rawX = 0;
     int16 rawY = 0;
     int16 rawZ = 0;
+    float rangeScale = 0.0f;
     boolean returnBool = FALSE;
     boolean rangeSet = FALSE;
     boolean configSet = FALSE;
@@ -682,6 +685,7 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
         rangeSet = TRUE;
         goto end_of_function;
     }
+    rangeScale = 1.0f / 660.0f;
     /* Set negative bias enable */
     config |= HMC5883_NEG_BIAS_ENABLE;
     returnBool = HMC5883_Custom_Set_Config(config);
@@ -701,7 +705,6 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
         {
             goto end_of_function;
         }
-        OS_printf("first ten X = %d, Y = %d, Z = %d\n", rawX, rawY, rawZ);
     }
     
     /* read the sensor up to 150x, stopping when we have 50 good values */
@@ -713,9 +716,9 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
             goto end_of_function;
         }
 
-        cal[0] = fabsf(expected_cal[0] / rawX);
-        cal[1] = fabsf(expected_cal[1] / rawY);
-        cal[2] = fabsf(expected_cal[2] / rawZ);
+        cal[0] = fabsf(expected_cal[0] / (rawX * rangeScale));
+        cal[1] = fabsf(expected_cal[1] / (rawY * rangeScale));
+        cal[2] = fabsf(expected_cal[2] / (rawZ * rangeScale));
 
 
         if (cal[0] > 0.3f && cal[0] < 1.7f &&
@@ -746,8 +749,6 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
         Calibration->x_scale  = 1.0f / scaling[0];
         Calibration->y_scale  = 1.0f / scaling[1];
         Calibration->z_scale  = 1.0f / scaling[2];
-    
-        OS_printf("calibrated x = %f, y = %f, z = %f\n", HkTlm.Calibration.x_scale, HkTlm.Calibration.y_scale, HkTlm.Calibration.z_scale);
     }
 
 end_of_function:
@@ -777,6 +778,26 @@ boolean HMC5883::CheckScale(float X, float Y, float Z)
             "HMC5883 device failed check scale");
     }
     else
+    {
+        returnBool = TRUE;
+    }
+
+    return returnBool;
+}
+
+
+boolean CheckOffset(float X, float Y, float Z)
+{
+    boolean returnBool = FALSE;
+
+    if ((-2.0f * FLT_EPSILON < X && X < 2.0f * FLT_EPSILON) &&
+        (-2.0f * FLT_EPSILON < Y && Y < 2.0f * FLT_EPSILON) &&
+        (-2.0f * FLT_EPSILON < Z && Z < 2.0f * FLT_EPSILON)) 
+    {
+        CFE_EVS_SendEvent(HMC5883_OFFSET_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 device failed check offset");
+    } 
+    else 
     {
         returnBool = TRUE;
     }
