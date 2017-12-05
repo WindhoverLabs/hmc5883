@@ -238,7 +238,6 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed validate ID");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    /* TODO self calibration routine */
     returnBool = SelfCalibrate(&HkTlm.Calibration);
     if (FALSE == returnBool)
     {
@@ -742,17 +741,24 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
         }
     }
 
+    /* Check that we have at least 5 good values for an average */
     if (good_count < 5) 
     {
         returnBool = FALSE;
         goto end_of_function;
     }
+    /* Get the average */
     scaling[0] = sum_excited[0] / good_count;
     scaling[1] = sum_excited[1] / good_count;
     scaling[2] = sum_excited[2] / good_count;
-    
+    /* Apply platform rotation to the calibration scale factors */
+    returnBool = HMC5883_Apply_Platform_Rotation_Float(&scaling[0], &scaling[1], &scaling[2]);
+    if(FALSE == returnBool)
+    {
+        goto end_of_function;
+    }
+    /* Sanity check scale values */
     returnBool = CheckScale(scaling[0], scaling[1], scaling[2]);
-    
     if (TRUE == returnBool)
     {
         /* Set scaling  */

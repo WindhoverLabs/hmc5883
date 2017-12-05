@@ -182,6 +182,25 @@ boolean HMC5883_Apply_Platform_Rotation(int16 *X, int16 *Y, int16 *Z);
 
 
 /************************************************************************/
+/** \brief Apply any required rotation of the sensor x, y, and z axis.
+**
+**  \par Description
+**       This function will apply rotation to match the orientation
+**       of the sensor on the vehicle.
+**
+**  \param [out]    X    Raw X value.
+**
+**  \param [out]    Y    Raw Y value.
+**
+**  \param [out]    Z    Raw Z value.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Apply_Platform_Rotation_Float(float *X, float *Y, float *Z);
+
+
+/************************************************************************/
 /** \brief Validate the device ID.
 **
 **  \par Description

@@ -134,3 +134,8 @@ boolean HMC5883_Custom_Get_Range(uint8 *Range)
 {
     return TRUE;
 }
+
+boolean HMC5883_Apply_Platform_Rotation_Float(float *X, float *Y, float *Z)
+{
+    return TRUE;
+}
