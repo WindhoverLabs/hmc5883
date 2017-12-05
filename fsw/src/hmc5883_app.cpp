@@ -184,6 +184,9 @@ void HMC5883::InitData()
     HkTlm.Calibration.x_offset = 0.0f;
     HkTlm.Calibration.y_offset = 0.0f;
     HkTlm.Calibration.z_offset = 0.0f;
+
+    HkTlm.ConfigA              = (HMC5883_BITS_CONFIG_A_DEFAULT | HMC5983_TEMP_SENSOR_ENABLE);
+    HkTlm.ConfigB              = HMC5883_BITS_CONFIG_B_RANGE_1GA3;
     /* Set range and scale */
     HkTlm.Range                = 1.3f;
     HkTlm.Scaling              = 1.0f / 1090.0f;
@@ -244,16 +247,7 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed calibration");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = EnableTempCompensation();
-    if (FALSE == returnBool)
-    {
-        iStatus = -1;
-        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
-            "HMC5883 Device failed enable temp compensation");
-        goto HMC5883_InitApp_Exit_Tag;
-    }
-
-    returnBool = HMC5883_Custom_Set_Range(HMC5883_BITS_CONFIG_B_RANGE_1GA3);
+    returnBool = HMC5883_Custom_Set_Range(HkTlm.ConfigB);
     if (FALSE == returnBool)
     {
         iStatus = -1;
@@ -261,12 +255,28 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed set range");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = HMC5883_Custom_Check_Range(HMC5883_BITS_CONFIG_B_RANGE_1GA3);
+    returnBool = HMC5883_Custom_Check_Range(HkTlm.ConfigB);
     if (FALSE == returnBool)
     {
         iStatus = -1;
         CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
             "HMC5883 Device failed check range");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
+    returnBool = HMC5883_Custom_Set_Config(HkTlm.ConfigA);
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed set config");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
+    returnBool = HMC5883_Custom_Check_Config(HkTlm.ConfigA);
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed check config");
         goto HMC5883_InitApp_Exit_Tag;
     }
     
@@ -706,7 +716,7 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
             goto end_of_function;
         }
     }
-    
+
     /* read the sensor up to 150x, stopping when we have 50 good values */
     for (i = 0; i < 150 && good_count < 50; i++) 
     {
@@ -772,7 +782,7 @@ boolean HMC5883::CheckScale(float X, float Y, float Z)
 
     if ((-FLT_EPSILON + 1.0f < X && X < FLT_EPSILON + 1.0f) &&
         (-FLT_EPSILON + 1.0f < Y && Y < FLT_EPSILON + 1.0f) &&
-        (-FLT_EPSILON + 1.0f < Z && Z < FLT_EPSILON + 1.0f)) 
+        (-FLT_EPSILON + 1.0f < Z && Z < FLT_EPSILON + 1.0f))
     {
         CFE_EVS_SendEvent(HMC5883_SCALE_ERR_EID, CFE_EVS_ERROR,
             "HMC5883 device failed check scale");
@@ -792,7 +802,7 @@ boolean CheckOffset(float X, float Y, float Z)
 
     if ((-2.0f * FLT_EPSILON < X && X < 2.0f * FLT_EPSILON) &&
         (-2.0f * FLT_EPSILON < Y && Y < 2.0f * FLT_EPSILON) &&
-        (-2.0f * FLT_EPSILON < Z && Z < 2.0f * FLT_EPSILON)) 
+        (-2.0f * FLT_EPSILON < Z && Z < 2.0f * FLT_EPSILON))
     {
         CFE_EVS_SendEvent(HMC5883_OFFSET_ERR_EID, CFE_EVS_ERROR,
             "HMC5883 device failed check offset");
@@ -801,29 +811,6 @@ boolean CheckOffset(float X, float Y, float Z)
     {
         returnBool = TRUE;
     }
-
-    return returnBool;
-}
-
-
-boolean HMC5883::EnableTempCompensation(void)
-{
-    uint8 config = 0;
-    boolean returnBool = FALSE;
-
-    /* Get the current configuration */
-    returnBool = HMC5883_Custom_Get_Config(&config);
-    if (FALSE == returnBool)
-    {
-        goto end_of_function;
-    }
-    /* Enable the temp sensor bit */
-    config |= HMC5983_TEMP_SENSOR_ENABLE;
-    
-    /* Set the new configuration */
-    returnBool = HMC5883_Custom_Set_Config(config);
-
-end_of_function:
 
     return returnBool;
 }

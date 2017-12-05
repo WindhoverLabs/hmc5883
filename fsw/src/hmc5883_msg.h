@@ -170,6 +170,10 @@ typedef struct
     float              Range;
     /** \brief Current scale value */
     float              Scaling;
+    /** \brief Current Device configuration register A value */
+    uint8              ConfigA;
+    /** \brief Current Device configuration register B value */
+    uint8              ConfigB;
 } HMC5883_HkTlm_t;
 
 

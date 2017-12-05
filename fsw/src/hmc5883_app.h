@@ -74,6 +74,13 @@ extern "C" {
 */
 #define HMC5883_BITS_CONFIG_B_RANGE_2GA5          (0x03 << 5)
 
+/** \brief Configuration register A default value.
+**
+**  \par Description:
+**       Data output rate default.
+*/
+#define HMC5883_BITS_CONFIG_A_DEFAULT             (0x10)
+
 /** \brief Enabled temperature compensation (HMC5983).
 **
 **  \par Limits:
@@ -355,18 +362,6 @@ public:
     **
     *************************************************************************/
     boolean SelfCalibrate(HMC5883_Calibration_t *Calibration);
-    
-    /************************************************************************/
-    /** \brief Enable temperature compensation on the HMC5983.
-    **
-    **  \par Description
-    **       Enable for automatic compensation of
-    **       Sensitivity over temperature
-    **
-    **  \returns    TRUE for success, FALSE for failure.
-    **
-    *************************************************************************/
-    boolean EnableTempCompensation(void);
 
     /************************************************************************/
     /** \brief Validate scale values.
