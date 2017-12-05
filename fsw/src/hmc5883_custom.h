@@ -194,21 +194,6 @@ boolean HMC5883_Custom_ValidateID(void);
 
 
 /************************************************************************/
-/** \brief Run the self calibration routine.
-**
-**  \par Description
-**       This function uses the device built in self test to create a
-**       bias for calibration.
-**
-**  \param [out]    Calibration    The calibration result.
-**
-**  \returns    TRUE for success, FALSE for failure.
-**
-*************************************************************************/
-boolean HMC5883_Custom_Calibration(HMC5883_Calibration_t *Calibration);
-
-
-/************************************************************************/
 /** \brief Set the sensor field range (gain).
 **
 **  \par Description

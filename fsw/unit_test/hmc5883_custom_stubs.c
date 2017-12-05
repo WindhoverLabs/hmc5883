@@ -94,12 +94,6 @@ boolean HMC5883_Apply_Platform_Rotation(int16 *X, int16 *Y, int16 *Z)
 }
 
 
-boolean HMC5883_Custom_Calibration(HMC5883_Calibration_t *Calibration)
-{
-    return TRUE;
-}
-
-
 boolean HMC5883_Custom_Set_Config(uint8 Config)
 {
     return TRUE;

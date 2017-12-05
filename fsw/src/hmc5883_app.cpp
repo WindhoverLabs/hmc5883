@@ -237,7 +237,7 @@ int32 HMC5883::InitApp()
     /* TODO add self test*/
 
     /* TODO self calibration routine */
-    returnBool = HMC5883_Custom_Calibration(&HkTlm.Calibration);
+    returnBool = SelfCalibrate(&HkTlm.Calibration);
     if (FALSE == returnBool)
     {
         iStatus = -1;
@@ -612,6 +612,29 @@ void HMC5883::ReadDevice(void)
     
 end_of_function:
 ;
+}
+
+
+boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
+{
+
+    ///* Set to 2.5 Gauss.*/
+    //returnBool = HMC5883_Custom_Set_Range(HMC5883_BITS_CONFIG_B_RANGE_2GA5);
+    //if (FALSE == returnBool)
+    //{
+        //CFE_EVS_SendEvent(HMC5883_DEVICE_ERR_EID, CFE_EVS_ERROR,
+            //"HMC5883 Device failed set range");
+    //}
+
+    //return returnBool;
+    
+    return TRUE;
+}
+
+
+boolean HMC5883::EnableTempCompensation(void)
+{
+    return TRUE;
 }
 
 
