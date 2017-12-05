@@ -297,6 +297,19 @@ typedef enum {
 **
 */
     HMC5883_VALIDATE_ERR_EID,
+/** \brief <tt> 'Failed to validate scale' </tt>
+**  \event <tt> 'Failed to validate scale' </tt>
+**
+**  \par Type: ERROR
+**
+**  \par Cause:
+**
+**  This event message is issued when the scale calibration fails 
+**  validation.
+**
+**
+*/
+    HMC5883_SCALE_ERR_EID,
 
 /** \brief <tt> This is a count of all the app events and should not be used. </tt> */
 	HMC5883_EVT_CNT

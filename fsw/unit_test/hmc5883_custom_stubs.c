@@ -128,3 +128,9 @@ boolean HMC5883_Custom_Measure_Temp(int16 *Temp)
 {
     return TRUE;
 }
+
+
+boolean HMC5883_Custom_Get_Range(uint8 *Range)
+{
+    return TRUE;
+}

@@ -209,6 +209,21 @@ boolean HMC5883_Custom_Set_Range(uint8 Range);
 
 
 /************************************************************************/
+/** \brief Get the sensor field range (gain).
+**
+**  \par Description
+**       This function gets the current configuration register B gain
+**       gain configuration bits.
+**
+**  \param [out]    Range   The output range.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_Get_Range(uint8 *Range);
+
+
+/************************************************************************/
 /** \brief Check the value of the sensor field range (gain).
 **
 **  \par Description
@@ -280,6 +295,9 @@ boolean HMC5883_Custom_Get_Config(uint8 *Config);
 **
 *************************************************************************/
 boolean HMC5883_Custom_Measure_Temp(int16 *Temp);
+
+
+
 
 #ifdef __cplusplus
 }

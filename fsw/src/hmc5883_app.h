@@ -81,6 +81,23 @@ extern "C" {
 */
 #define HMC5983_TEMP_SENSOR_ENABLE                (1 << 7)
 
+/** \brief Enable positive bias configuration for X, Y, and Z axes.
+** 
+**  \par Description:
+**       In this configuration, a positive current is forced across the 
+**       resistive load for all three axes.
+*/
+#define HMC5883_POS_BIAS_ENABLE                   (0x01)
+
+/** \brief Enable negative bias configuration for X, Y, and Z axes.
+** 
+**  \par Description:
+**       In this configuration, a negative current is forced across the 
+**       resistive load for all three axes.
+*/
+#define HMC5883_NEG_BIAS_ENABLE                   (0x02)
+
+
 /************************************************************************
  ** Local Structure Definitions
  *************************************************************************/
@@ -350,6 +367,8 @@ public:
     **
     *************************************************************************/
     boolean EnableTempCompensation(void);
+    
+    boolean CheckScale(float X, float Y, float Z);
 };
 
 

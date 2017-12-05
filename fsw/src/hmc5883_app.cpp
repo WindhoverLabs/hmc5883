@@ -2,6 +2,8 @@
 ** Includes
 *************************************************************************/
 #include <string.h>
+#include <math.h>
+#include <float.h>
 
 #include "cfe.h"
 
@@ -233,17 +235,6 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed validate ID");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = EnableTempCompensation();
-    if (FALSE == returnBool)
-    {
-        iStatus = -1;
-        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
-            "HMC5883 Device failed enable temp compensation");
-        goto HMC5883_InitApp_Exit_Tag;
-    }
-
-    /* TODO add self test*/
-
     /* TODO self calibration routine */
     returnBool = SelfCalibrate(&HkTlm.Calibration);
     if (FALSE == returnBool)
@@ -253,6 +244,15 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed calibration");
         goto HMC5883_InitApp_Exit_Tag;
     }
+    returnBool = EnableTempCompensation();
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed enable temp compensation");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
+
     returnBool = HMC5883_Custom_Set_Range(HMC5883_BITS_CONFIG_B_RANGE_1GA3);
     if (FALSE == returnBool)
     {
@@ -583,9 +583,6 @@ void HMC5883::ReadDevice(void)
 {
     boolean returnBool = FALSE;
     static uint8 temp_count = 0;
-    //float rawX_f = 0;
-    //float rawY_f = 0;
-    //float rawZ_f = 0;
     int16 temp = 0;
     CFE_TIME_SysTime_t cfeTimeStamp = {0, 0};
 
@@ -645,18 +642,146 @@ end_of_function:
 
 boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
 {
-
-    ///* Set to 2.5 Gauss.*/
-    //returnBool = HMC5883_Custom_Set_Range(HMC5883_BITS_CONFIG_B_RANGE_2GA5);
-    //if (FALSE == returnBool)
-    //{
-        //CFE_EVS_SendEvent(HMC5883_DEVICE_ERR_EID, CFE_EVS_ERROR,
-            //"HMC5883 Device failed set range");
-    //}
-
-    //return returnBool;
+    uint8 range = 0;
+    uint8 config = 0;
+    uint8 i = 0;
+    uint8 good_count = 0;
+    int16 rawX = 0;
+    int16 rawY = 0;
+    int16 rawZ = 0;
+    boolean returnBool = FALSE;
+    boolean rangeSet = FALSE;
+    boolean configSet = FALSE;
     
-    return TRUE;
+    /* expected axis scaling. The datasheet says that 766 will
+     * be places in the X and Y axes and 713 in the Z
+     * axis. Experiments show that in fact 766 is placed in X,
+     * and 713 in Y and Z. This is relative to a base of 660
+     * LSM/Ga, giving 1.16 and 1.08 */
+    float expected_cal[3] = { 1.16f, 1.08f, 1.08f };
+    float sum_excited[3]  = { 0.0f, 0.0f, 0.0f };
+    float cal[3]          = { 0.0f, 0.0f, 0.0f };
+    float scaling[3]      = { 0.0f, 0.0f, 0.0f };
+    
+    /* Save the current range setting */
+    returnBool = HMC5883_Custom_Get_Range(&range);
+    if (FALSE == returnBool)
+    {
+        goto end_of_function;
+    }
+    /* Save the current configuration */
+    returnBool = HMC5883_Custom_Get_Config(&config);
+    if (FALSE == returnBool)
+    {
+        goto end_of_function;
+    }
+    /* Set to 2.5 Gauss.*/
+    returnBool = HMC5883_Custom_Set_Range(HMC5883_BITS_CONFIG_B_RANGE_2GA5);
+    if (FALSE == returnBool)
+    {
+        rangeSet = TRUE;
+        goto end_of_function;
+    }
+    /* Set negative bias enable */
+    config |= HMC5883_NEG_BIAS_ENABLE;
+    returnBool = HMC5883_Custom_Set_Config(config);
+    if (FALSE == returnBool)
+    {
+        configSet = TRUE;
+        goto end_of_function;
+    }
+    /* Set the saved config back to normal */
+    config &= ~HMC5883_NEG_BIAS_ENABLE;
+
+    /* Discard 10 samples to let the sensor settle */
+    for (i = 0; i < 10; i++) 
+    {
+        returnBool = HMC5883_Custom_Measure(&rawX, &rawY, &rawZ);
+        if(FALSE == returnBool)
+        {
+            goto end_of_function;
+        }
+        OS_printf("first ten X = %d, Y = %d, Z = %d\n", rawX, rawY, rawZ);
+    }
+    
+    /* read the sensor up to 150x, stopping when we have 50 good values */
+    for (i = 0; i < 150 && good_count < 50; i++) 
+    {
+        returnBool = HMC5883_Custom_Measure(&rawX, &rawY, &rawZ);
+        if(FALSE == returnBool)
+        {
+            goto end_of_function;
+        }
+
+        cal[0] = fabsf(expected_cal[0] / rawX);
+        cal[1] = fabsf(expected_cal[1] / rawY);
+        cal[2] = fabsf(expected_cal[2] / rawZ);
+
+
+        if (cal[0] > 0.3f && cal[0] < 1.7f &&
+            cal[1] > 0.3f && cal[1] < 1.7f &&
+            cal[2] > 0.3f && cal[2] < 1.7f) 
+        {
+            good_count++;
+            sum_excited[0] += cal[0];
+            sum_excited[1] += cal[1];
+            sum_excited[2] += cal[2];
+        }
+    }
+
+    if (good_count < 5) 
+    {
+        returnBool = FALSE;
+        goto end_of_function;
+    }
+    scaling[0] = sum_excited[0] / good_count;
+    scaling[1] = sum_excited[1] / good_count;
+    scaling[2] = sum_excited[2] / good_count;
+    
+    returnBool = CheckScale(scaling[0], scaling[1], scaling[2]);
+    
+    if (TRUE == returnBool)
+    {
+        /* Set scaling  */
+        Calibration->x_scale  = 1.0f / scaling[0];
+        Calibration->y_scale  = 1.0f / scaling[1];
+        Calibration->z_scale  = 1.0f / scaling[2];
+    
+        OS_printf("calibrated x = %f, y = %f, z = %f\n", HkTlm.Calibration.x_scale, HkTlm.Calibration.y_scale, HkTlm.Calibration.z_scale);
+    }
+
+end_of_function:
+
+    if (TRUE == rangeSet)
+    {
+        /* return the range setting back to normal */
+        HMC5883_Custom_Set_Range(range);
+    }
+    if (TRUE == configSet)
+    {
+        HMC5883_Custom_Set_Config(config);
+    }
+    return returnBool;
+}
+
+
+boolean HMC5883::CheckScale(float X, float Y, float Z)
+{
+    boolean returnBool = FALSE;
+
+    if ((-FLT_EPSILON + 1.0f < X && X < FLT_EPSILON + 1.0f) &&
+        (-FLT_EPSILON + 1.0f < Y && Y < FLT_EPSILON + 1.0f) &&
+        (-FLT_EPSILON + 1.0f < Z && Z < FLT_EPSILON + 1.0f)) 
+    {
+        CFE_EVS_SendEvent(HMC5883_SCALE_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 device failed check scale");
+    }
+    else
+    {
+        returnBool = TRUE;
+    }
+
+    return returnBool;
 }
 
 
