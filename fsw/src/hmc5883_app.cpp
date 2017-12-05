@@ -233,7 +233,15 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed validate ID");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    
+    returnBool = EnableTempCompensation();
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed enable temp compensation");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
+
     /* TODO add self test*/
 
     /* TODO self calibration routine */
@@ -574,9 +582,11 @@ void HMC5883::AppMain()
 void HMC5883::ReadDevice(void)
 {
     boolean returnBool = FALSE;
-    float rawX_f = 0;
-    float rawY_f = 0;
-    float rawZ_f = 0;
+    static uint8 temp_count = 0;
+    //float rawX_f = 0;
+    //float rawY_f = 0;
+    //float rawZ_f = 0;
+    float temp_f = 0;
     CFE_TIME_SysTime_t cfeTimeStamp = {0, 0};
 
     cfeTimeStamp = HMC5883_Custom_Get_Time();
@@ -610,6 +620,24 @@ void HMC5883::ReadDevice(void)
     /* Set scale */
     SensorMagMsg.Scaling = HkTlm.Scaling;
     
+    /* Measure temperature every 100 mag samples */
+    if(temp_count == 100)
+    {
+        returnBool = HMC5883_Custom_Measure_Temp(&temp_f);
+        if(FALSE == returnBool)
+        {
+            goto end_of_function;
+        }
+        
+        SensorMagMsg.Temperature = 25 + (temp_f / (16 * 8.0f));
+        OS_printf("HMC5983 temp = %f\n", SensorMagMsg.Temperature);
+        temp_count = 0;
+    }
+    else
+    {
+        temp_count++;
+    }
+
 end_of_function:
 ;
 }
@@ -634,7 +662,28 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
 
 boolean HMC5883::EnableTempCompensation(void)
 {
-    return TRUE;
+    uint8 config = 0;
+    boolean returnBool = FALSE;
+
+    /* Get the current configuration */
+    returnBool = HMC5883_Custom_Get_Config(&Config);
+    if (FALSE == returnBool)
+    {
+        goto end_of_function;
+    }
+    /* Enable the temp sensor bit */
+    config |= HMC5983_TEMP_SENSOR_ENABLE;
+    
+    /* Set the new configuration */
+    returnBool = HMC5883_Custom_Set_Config(config);
+    if (FALSE == returnBool)
+    {
+        goto end_of_function;
+    }
+
+goto end_of_function;
+
+    return returnBool;
 }
 
 

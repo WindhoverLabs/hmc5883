@@ -100,6 +100,12 @@ boolean HMC5883_Custom_Set_Config(uint8 Config)
 }
 
 
+boolean HMC5883_Custom_Get_Config(uint8 *Config)
+{
+    return TRUE;
+}
+
+
 boolean HMC5883_Custom_Check_Config(uint8 Config)
 {
     return TRUE;
@@ -113,6 +119,12 @@ boolean HMC5883_Custom_Check_Range(uint8 Range)
 
 
 boolean HMC5883_Custom_Set_Range(uint8 Range)
+{
+    return TRUE;
+}
+
+
+boolean HMC5883_Custom_Measure_Temp(int16 *Temp)
 {
     return TRUE;
 }

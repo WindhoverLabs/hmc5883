@@ -253,6 +253,22 @@ boolean HMC5883_Custom_Check_Config(uint8 Config);
 *************************************************************************/
 boolean HMC5883_Custom_Set_Config(uint8 Config);
 
+
+/************************************************************************/
+/** \brief Get the value of the sensor configuration.
+**
+**  \par Description
+**       This function gets the current configuration.
+**
+**  \param [out]    Config   The configuration output.
+**
+**  \returns    TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_Set_Config(uint8 *Config);
+
+
+
 #ifdef __cplusplus
 }
 #endif 
