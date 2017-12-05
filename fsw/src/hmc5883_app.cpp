@@ -586,7 +586,7 @@ void HMC5883::ReadDevice(void)
     //float rawX_f = 0;
     //float rawY_f = 0;
     //float rawZ_f = 0;
-    float temp_f = 0;
+    int16 temp = 0;
     CFE_TIME_SysTime_t cfeTimeStamp = {0, 0};
 
     cfeTimeStamp = HMC5883_Custom_Get_Time();
@@ -623,13 +623,13 @@ void HMC5883::ReadDevice(void)
     /* Measure temperature every 100 mag samples */
     if(temp_count == 100)
     {
-        returnBool = HMC5883_Custom_Measure_Temp(&temp_f);
+        returnBool = HMC5883_Custom_Measure_Temp(&temp);
         if(FALSE == returnBool)
         {
             goto end_of_function;
         }
         
-        SensorMagMsg.Temperature = 25 + (temp_f / (16 * 8.0f));
+        SensorMagMsg.Temperature = 25 + (temp / (16 * 8.0f));
         OS_printf("HMC5983 temp = %f\n", SensorMagMsg.Temperature);
         temp_count = 0;
     }
@@ -666,7 +666,7 @@ boolean HMC5883::EnableTempCompensation(void)
     boolean returnBool = FALSE;
 
     /* Get the current configuration */
-    returnBool = HMC5883_Custom_Get_Config(&Config);
+    returnBool = HMC5883_Custom_Get_Config(&config);
     if (FALSE == returnBool)
     {
         goto end_of_function;
@@ -676,12 +676,8 @@ boolean HMC5883::EnableTempCompensation(void)
     
     /* Set the new configuration */
     returnBool = HMC5883_Custom_Set_Config(config);
-    if (FALSE == returnBool)
-    {
-        goto end_of_function;
-    }
 
-goto end_of_function;
+end_of_function:
 
     return returnBool;
 }

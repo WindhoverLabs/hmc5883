@@ -265,9 +265,21 @@ boolean HMC5883_Custom_Set_Config(uint8 Config);
 **  \returns    TRUE for success, FALSE for failure.
 **
 *************************************************************************/
-boolean HMC5883_Custom_Set_Config(uint8 *Config);
+boolean HMC5883_Custom_Get_Config(uint8 *Config);
 
-
+/************************************************************************/
+/** \brief Read temperature values from a HMC5983.
+**
+**  \par Description
+**       This function returns raw temperature from the HMC5883.
+**
+**  \param [out]    Temp    Raw temperature value.
+**
+**  \returns
+**       TRUE for success, FALSE for failure.
+**
+*************************************************************************/
+boolean HMC5883_Custom_Measure_Temp(int16 *Temp);
 
 #ifdef __cplusplus
 }
