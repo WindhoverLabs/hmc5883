@@ -11,6 +11,7 @@
 #include "hmc5883_app.h"
 #include "hmc5883_msg.h"
 #include "hmc5883_version.h"
+#include "lib/px4lib.h"
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -593,13 +594,10 @@ void HMC5883::ReadDevice(void)
     boolean returnBool = FALSE;
     static uint8 temp_count = 0;
     int16 temp = 0;
-    CFE_TIME_SysTime_t cfeTimeStamp = {0, 0};
-
-    cfeTimeStamp = HMC5883_Custom_Get_Time();
+    uint64 timeStamp = PX4LIB_GetPX4TimeUs();
     
     /* Timestamp */
-    SensorMagMsg.Timestamp.Seconds = cfeTimeStamp.Seconds;
-    SensorMagMsg.Timestamp.Subseconds = cfeTimeStamp.Subseconds;
+    SensorMagMsg.Timestamp = timeStamp;
 
     /* Mag */
     returnBool = HMC5883_Custom_Measure(&SensorMagMsg.XRaw, &SensorMagMsg.YRaw, &SensorMagMsg.ZRaw);

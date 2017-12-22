@@ -150,19 +150,6 @@ boolean HMC5883_Custom_Measure(int16 *X, int16 *Y, int16 *Z);
 
 
 /************************************************************************/
-/** \brief Gets the current monotonic time.
-**
-**  \par Description
-**       This function gets the current monotonic time and returns a 
-**       populated CFE_TIME_SysTime_t struct. 
-**
-**  \returns    CFE_TIME_SysTime_t
-**
-*************************************************************************/
-CFE_TIME_SysTime_t HMC5883_Custom_Get_Time(void);
-
-
-/************************************************************************/
 /** \brief Apply any required rotation of the sensor x, y, and z axis.
 **
 **  \par Description
