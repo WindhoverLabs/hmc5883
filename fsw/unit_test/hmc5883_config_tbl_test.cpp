@@ -31,18 +31,32 @@
 *
 *****************************************************************************/
 
-#include "uttest.h"
-#include "hmc5883_app_test.h"
-#include "hmc5883_cmds_test.h"
+#include "cfe.h"
+#include "hmc5883_msg.h"
 #include "hmc5883_config_tbl_test.h"
+#include "hmc5883_test_utils.h"
+#include "uttest.h"
+#include "ut_osapi_stubs.h"
+#include "ut_cfe_sb_stubs.h"
+#include "ut_cfe_es_stubs.h"
+#include "ut_cfe_es_hooks.h"
+#include "ut_cfe_evs_stubs.h"
+#include "ut_cfe_evs_hooks.h"
+#include "ut_cfe_time_stubs.h"
+#include "ut_cfe_psp_memutils_stubs.h"
+#include "ut_cfe_tbl_stubs.h"
+#include "ut_cfe_fs_stubs.h"
+#include "ut_cfe_time_stubs.h"
 
-int main(void)
-{   
-    HMC5883_App_Test_AddTestCases();
-    HMC5883_Cmds_Test_AddTestCases();
-    HMC5883_Config_Tbl_Test_AddTestCases();
-
-    return(UtTest_Run());
+void HMC5883_Config_Tbl_Test_Case1(void)
+{
 
 }
+
+
+void HMC5883_Config_Tbl_Test_AddTestCases(void)
+{
+    UtTest_Add(HMC5883_Config_Tbl_Test_Case1, HMC5883_Test_Setup, HMC5883_Test_TearDown, "HMC5883_Config_Tbl_Test_Case1");
+}
+
 

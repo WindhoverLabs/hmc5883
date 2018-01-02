@@ -48,6 +48,13 @@
 
 #include <time.h>
 
+/*
+ * Config table for testing
+ */
+HMC5883_ConfigTbl_t ConfigTbl = {
+        /* TODO:  Define table */
+		0
+};
 
 /*
  * Function Definitions
@@ -65,6 +72,8 @@ void HMC5883_Test_Setup(void)
     Ut_CFE_ES_Reset();
     Ut_OSAPI_Reset();
     Ut_OSFILEAPI_Reset();
+
+    Ut_CFE_TBL_AddTable(HMC5883_CONFIG_TABLE_FILENAME, (void *) &ConfigTbl);
 }
 
 void HMC5883_Test_TearDown(void) 

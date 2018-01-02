@@ -31,18 +31,48 @@
 *
 *****************************************************************************/
 
-#include "uttest.h"
-#include "hmc5883_app_test.h"
-#include "hmc5883_cmds_test.h"
-#include "hmc5883_config_tbl_test.h"
+#ifndef HMC5883_TBLDEFS_H
+#define HMC5883_TBLDEFS_H
 
-int main(void)
-{   
-    HMC5883_App_Test_AddTestCases();
-    HMC5883_Cmds_Test_AddTestCases();
-    HMC5883_Config_Tbl_Test_AddTestCases();
+/************************************************************************
+** Pragmas
+*************************************************************************/
 
-    return(UtTest_Run());
+/************************************************************************
+** Includes
+*************************************************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include "cfe.h"
+#include "hmc5883_platform_cfg.h"
+
+/************************************************************************
+** Local Defines
+*************************************************************************/
+
+/**
+ * \brief Defines the table identification name used for the
+ * configuration table registration.
+ */
+#define HMC5883_CONFIG_TABLENAME ("CONFIG_TBL")
+
+
+/** \brief Definition for a single config table entry */
+typedef struct
+{
+    /* TODO:  Define the configuration table. */
+	uint32  temp;
+} HMC5883_ConfigTbl_t;
+
+
+#ifdef __cplusplus
 }
+#endif
 
+#endif /* HMC5883_TBLDEFS_H */
+
+/************************/
+/*  End of File Comment */
+/************************/

@@ -189,8 +189,8 @@ void HMC5883::InitData()
     HkTlm.ConfigA              = (HMC5883_BITS_CONFIG_A_DEFAULT | HMC5983_TEMP_SENSOR_ENABLE);
     HkTlm.ConfigB              = HMC5883_BITS_CONFIG_B_RANGE_1GA3;
     /* Set range and scale */
-    HkTlm.Range                = 1.3f;
-    HkTlm.Scaling              = 1.0f / 1090.0f;
+    HkTlm.Range                = HMC5883_CALC_MAG_RANGE;
+    HkTlm.Scaling              = HMC5883_CALC_MAG_SCALING;
 }
 
 
@@ -222,7 +222,14 @@ int32 HMC5883::InitApp()
         goto HMC5883_InitApp_Exit_Tag;
     }
 
+    iStatus = InitConfigTbl();
+    if (iStatus != CFE_SUCCESS)
+    {
+        goto HMC5883_InitApp_Exit_Tag;
+    }
+
     InitData();
+
     returnBool = HMC5883_Custom_Init();
     if (FALSE == returnBool)
     {
@@ -239,14 +246,14 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed validate ID");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = SelfCalibrate(&HkTlm.Calibration);
-    if (FALSE == returnBool)
-    {
-        iStatus = -1;
-        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
-            "HMC5883 Device failed calibration");
-        goto HMC5883_InitApp_Exit_Tag;
-    }
+    //returnBool = SelfCalibrate(&HkTlm.Calibration);
+    //if (FALSE == returnBool)
+    //{
+        //iStatus = -1;
+        //CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            //"HMC5883 Device failed calibration");
+        //goto HMC5883_InitApp_Exit_Tag;
+    //}
     returnBool = HMC5883_Custom_Set_Range(HkTlm.ConfigB);
     if (FALSE == returnBool)
     {
@@ -579,6 +586,13 @@ void HMC5883::AppMain()
     while (CFE_ES_RunLoop(&uiRunStatus) == TRUE)
     {
         RcvSchPipeMsg(HMC5883_SCH_PIPE_PEND_TIME);
+
+        iStatus = AcquireConfigPointers();
+        if(iStatus != CFE_SUCCESS)
+        {
+            /* We apparently tried to load a new table but failed.  Terminate the application. */
+            uiRunStatus = CFE_ES_APP_ERROR;
+        }
     }
 
     /* Stop Performance Log entry */

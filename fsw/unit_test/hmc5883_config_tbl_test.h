@@ -31,18 +31,17 @@
 *
 *****************************************************************************/
 
-#include "uttest.h"
-#include "hmc5883_app_test.h"
-#include "hmc5883_cmds_test.h"
-#include "hmc5883_config_tbl_test.h"
+#ifndef HMC5883_CONFIG_TBL_TEST_H
+#define HMC5883_CONFIG_TBL_TEST_H
 
-int main(void)
-{   
-    HMC5883_App_Test_AddTestCases();
-    HMC5883_Cmds_Test_AddTestCases();
-    HMC5883_Config_Tbl_Test_AddTestCases();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    return(UtTest_Run());
+void HMC5883_Config_Tbl_Test_AddTestCases(void);
 
+#ifdef __cplusplus
 }
+#endif
 
+#endif /* HMC5883_CONFIG_TBL_TEST_H */
