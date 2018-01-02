@@ -191,6 +191,8 @@ void HMC5883::InitData()
     /* Set range and scale */
     HkTlm.Range                = HMC5883_CALC_MAG_RANGE;
     HkTlm.Scaling              = HMC5883_CALC_MAG_SCALING;
+    HkTlm.Unit                 = HMC5883_MAG_UNIT;
+    HkTlm.Divider              = HMC5883_MAG_DIVIDER;
 }
 
 
@@ -628,11 +630,11 @@ void HMC5883::ReadDevice(void)
     }
 
     /* Set calibrated values */
-    SensorMagMsg.X = ((SensorMagMsg.XRaw * HkTlm.Scaling) - 
+    SensorMagMsg.X = ((SensorMagMsg.XRaw * (HkTlm.Unit / HkTlm.Divider)) - 
             HkTlm.Calibration.x_offset) * HkTlm.Calibration.x_scale;
-    SensorMagMsg.Y = ((SensorMagMsg.YRaw * HkTlm.Scaling) - 
+    SensorMagMsg.Y = ((SensorMagMsg.YRaw * (HkTlm.Unit / HkTlm.Divider)) - 
             HkTlm.Calibration.y_offset) * HkTlm.Calibration.y_scale;
-    SensorMagMsg.Z = ((SensorMagMsg.ZRaw * HkTlm.Scaling) - 
+    SensorMagMsg.Z = ((SensorMagMsg.ZRaw * (HkTlm.Unit / HkTlm.Divider)) - 
             HkTlm.Calibration.z_offset) * HkTlm.Calibration.z_scale;
 
     /* Set range */

@@ -170,6 +170,10 @@ typedef struct
     float              Range;
     /** \brief Current scale value */
     float              Scaling;
+    /** \brief Current unit value */
+    float              Unit;
+    /** \brief Current divider value */
+    float              Divider;
     /** \brief Current Device configuration register A value */
     uint8              ConfigA;
     /** \brief Current Device configuration register B value */
