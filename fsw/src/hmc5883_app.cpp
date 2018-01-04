@@ -611,7 +611,10 @@ void HMC5883::ReadDevice(void)
     static uint8 temp_count = 0;
     int16 temp = 0;
     uint64 timeStamp = PX4LIB_GetPX4TimeUs();
-    
+    float xraw_f = 0;
+    float yraw_f = 0;
+    float zraw_f = 0;
+
     /* Timestamp */
     SensorMagMsg.Timestamp = timeStamp;
 
@@ -621,20 +624,29 @@ void HMC5883::ReadDevice(void)
     {
         goto end_of_function;
     }
+    
+    xraw_f = SensorMagMsg.XRaw;
+    yraw_f = SensorMagMsg.YRaw;
+    zraw_f = SensorMagMsg.ZRaw;
 
     /* Apply any rotation */
-    returnBool = HMC5883_Apply_Platform_Rotation(&SensorMagMsg.XRaw, &SensorMagMsg.YRaw, &SensorMagMsg.ZRaw);
+    returnBool = HMC5883_Apply_Platform_Rotation(&xraw_f, &yraw_f, &zraw_f);
     if(FALSE == returnBool)
     {
         goto end_of_function;
     }
 
+    /* Apply rotation to raw report as well */
+    SensorMagMsg.XRaw = xraw_f;
+    SensorMagMsg.YRaw = yraw_f;
+    SensorMagMsg.ZRaw = zraw_f;
+
     /* Set calibrated values */
-    SensorMagMsg.X = ((SensorMagMsg.XRaw * (HkTlm.Unit / HkTlm.Divider)) - 
+    SensorMagMsg.X = ((xraw_f * (HkTlm.Unit / HkTlm.Divider)) - 
             HkTlm.Calibration.x_offset) * HkTlm.Calibration.x_scale;
-    SensorMagMsg.Y = ((SensorMagMsg.YRaw * (HkTlm.Unit / HkTlm.Divider)) - 
+    SensorMagMsg.Y = ((yraw_f * (HkTlm.Unit / HkTlm.Divider)) - 
             HkTlm.Calibration.y_offset) * HkTlm.Calibration.y_scale;
-    SensorMagMsg.Z = ((SensorMagMsg.ZRaw * (HkTlm.Unit / HkTlm.Divider)) - 
+    SensorMagMsg.Z = ((zraw_f * (HkTlm.Unit / HkTlm.Divider)) - 
             HkTlm.Calibration.z_offset) * HkTlm.Calibration.z_scale;
 
     /* Set range */
@@ -769,7 +781,7 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
     scaling[2] = sum_excited[2] / good_count;
 
     /* Apply platform rotation to the calibration scale factors */
-    returnBool = HMC5883_Apply_Platform_Rotation_Float(&scaling[0], &scaling[1], &scaling[2]);
+    returnBool = HMC5883_Apply_Platform_Rotation(&scaling[0], &scaling[1], &scaling[2]);
     if(FALSE == returnBool)
     {
         goto end_of_function;

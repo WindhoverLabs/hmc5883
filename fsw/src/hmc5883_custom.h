@@ -165,7 +165,7 @@ boolean HMC5883_Custom_Measure(int16 *X, int16 *Y, int16 *Z);
 **  \returns    TRUE for success, FALSE for failure.
 **
 *************************************************************************/
-boolean HMC5883_Apply_Platform_Rotation(int16 *X, int16 *Y, int16 *Z);
+boolean HMC5883_Apply_Platform_Rotation(float *X, float *Y, float *Z);
 
 
 /************************************************************************/
