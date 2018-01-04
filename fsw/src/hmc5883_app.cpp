@@ -637,9 +637,9 @@ void HMC5883::ReadDevice(void)
     }
 
     /* Apply rotation to raw report as well */
-    SensorMagMsg.XRaw = xraw_f;
-    SensorMagMsg.YRaw = yraw_f;
-    SensorMagMsg.ZRaw = zraw_f;
+    //SensorMagMsg.XRaw = xraw_f;
+    //SensorMagMsg.YRaw = yraw_f;
+    //SensorMagMsg.ZRaw = zraw_f;
 
     /* Set calibrated values */
     SensorMagMsg.X = ((xraw_f * (HkTlm.Unit / HkTlm.Divider)) - 
