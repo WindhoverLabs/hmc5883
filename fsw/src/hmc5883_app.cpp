@@ -248,14 +248,14 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed validate ID");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    //returnBool = SelfCalibrate(&HkTlm.Calibration);
-    //if (FALSE == returnBool)
-    //{
-        //iStatus = -1;
-        //CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
-            //"HMC5883 Device failed calibration");
-        //goto HMC5883_InitApp_Exit_Tag;
-    //}
+    returnBool = SelfCalibrate(&HkTlm.Calibration);
+    if (FALSE == returnBool)
+    {
+        iStatus = -1;
+        CFE_EVS_SendEvent(HMC5883_INIT_ERR_EID, CFE_EVS_ERROR,
+            "HMC5883 Device failed calibration");
+        goto HMC5883_InitApp_Exit_Tag;
+    }
     returnBool = HMC5883_Custom_Set_Range(HkTlm.ConfigB);
     if (FALSE == returnBool)
     {
@@ -690,6 +690,9 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
     boolean returnBool = FALSE;
     boolean rangeSet = FALSE;
     boolean configSet = FALSE;
+    boolean xNeg = FALSE;
+    boolean yNeg = FALSE;
+    boolean zNeg = FALSE;
     
     /* expected axis scaling. The datasheet says that 766 will
      * be places in the X and Y axes and 713 in the Z
@@ -779,12 +782,42 @@ boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
     scaling[0] = sum_excited[0] / good_count;
     scaling[1] = sum_excited[1] / good_count;
     scaling[2] = sum_excited[2] / good_count;
-
+    
+    /* TODO move to internal calibration so rotation doesn't need to be
+     * applied */
+    if (scaling[0] < 0)
+    {
+        xNeg = TRUE;
+    }
+    if (scaling[1] < 0)
+    {
+        yNeg = TRUE;
+    }
+    if (scaling[2] < 0)
+    {
+        zNeg = TRUE;
+    }
+    
     /* Apply platform rotation to the calibration scale factors */
     returnBool = HMC5883_Apply_Platform_Rotation(&scaling[0], &scaling[1], &scaling[2]);
     if(FALSE == returnBool)
     {
         goto end_of_function;
+    }
+
+    /* TODO move to internal calibration so rotation doesn't need to be
+     * applied */
+    if (scaling[0] < 0 && FALSE == xNeg)
+    {
+        scaling[0] = fabs(scaling[0]);
+    }
+    if (scaling[1] < 0 && FALSE == yNeg)
+    {
+        scaling[1] = fabs(scaling[1]);
+    }
+    if (scaling[2] < 0 && FALSE == zNeg)
+    {
+        scaling[2] = fabs(scaling[2]);
     }
 
     /* Sanity check scale values */
