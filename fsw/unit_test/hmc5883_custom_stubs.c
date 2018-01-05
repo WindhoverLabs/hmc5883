@@ -138,3 +138,8 @@ boolean HMC5883_Apply_Platform_Rotation_Float(float *X, float *Y, float *Z)
 {
     return TRUE;
 }
+
+void HMC5883_Get_Rotation(uint8 *Rotation)
+{
+    
+}

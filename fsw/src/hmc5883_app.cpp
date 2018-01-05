@@ -173,26 +173,29 @@ void HMC5883::InitData()
 {
     /* Init housekeeping message. */
     CFE_SB_InitMsg(&HkTlm, HMC5883_HK_TLM_MID, sizeof(HkTlm), TRUE);
+    /* Init diagnostic message */
+    CFE_SB_InitMsg(&Diag,
+            HMC5883_DIAG_TLM_MID, sizeof(HMC5883_DiagPacket_t), TRUE);
     /* Init output messages */
     CFE_SB_InitMsg(&SensorMagMsg, PX4_SENSOR_MAG_MID, 
             sizeof(PX4_SensorMagMsg_t), TRUE);
     /* Init custom data */
     HMC5883_Custom_InitData();
     /* Set initial values for calibration */
-    HkTlm.Calibration.x_scale  = 1.0f;
-    HkTlm.Calibration.y_scale  = 1.0f;
-    HkTlm.Calibration.z_scale  = 1.0f;
-    HkTlm.Calibration.x_offset = 0.0f;
-    HkTlm.Calibration.y_offset = 0.0f;
-    HkTlm.Calibration.z_offset = 0.0f;
-
-    HkTlm.ConfigA              = (HMC5883_BITS_CONFIG_A_DEFAULT | HMC5983_TEMP_SENSOR_ENABLE);
-    HkTlm.ConfigB              = HMC5883_BITS_CONFIG_B_RANGE_1GA3;
+    Diag.Calibration.x_scale  = 1.0f;
+    Diag.Calibration.y_scale  = 1.0f;
+    Diag.Calibration.z_scale  = 1.0f;
+    Diag.Calibration.x_offset = 0.0f;
+    Diag.Calibration.y_offset = 0.0f;
+    Diag.Calibration.z_offset = 0.0f;
+    /* Conversion values */
+    Diag.Conversion.ConfigA   = (HMC5883_BITS_CONFIG_A_DEFAULT | HMC5983_TEMP_SENSOR_ENABLE);
+    Diag.Conversion.ConfigB   = HMC5883_BITS_CONFIG_B_RANGE_1GA3;
     /* Set range and scale */
-    HkTlm.Range                = HMC5883_CALC_MAG_RANGE;
-    HkTlm.Scaling              = HMC5883_CALC_MAG_SCALING;
-    HkTlm.Unit                 = HMC5883_MAG_UNIT;
-    HkTlm.Divider              = HMC5883_MAG_DIVIDER;
+    Diag.Conversion.Range     = HMC5883_CALC_MAG_RANGE;
+    Diag.Conversion.Scaling   = HMC5883_CALC_MAG_SCALING;
+    Diag.Conversion.Unit      = HMC5883_MAG_UNIT;
+    Diag.Conversion.Divider   = HMC5883_MAG_DIVIDER;
 }
 
 
@@ -248,7 +251,7 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed validate ID");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = SelfCalibrate(&HkTlm.Calibration);
+    returnBool = SelfCalibrate(&Diag.Calibration);
     if (FALSE == returnBool)
     {
         iStatus = -1;
@@ -256,7 +259,7 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed calibration");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = HMC5883_Custom_Set_Range(HkTlm.ConfigB);
+    returnBool = HMC5883_Custom_Set_Range(Diag.Conversion.ConfigB);
     if (FALSE == returnBool)
     {
         iStatus = -1;
@@ -264,7 +267,7 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed set range");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = HMC5883_Custom_Check_Range(HkTlm.ConfigB);
+    returnBool = HMC5883_Custom_Check_Range(Diag.Conversion.ConfigB);
     if (FALSE == returnBool)
     {
         iStatus = -1;
@@ -272,7 +275,7 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed check range");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = HMC5883_Custom_Set_Config(HkTlm.ConfigA);
+    returnBool = HMC5883_Custom_Set_Config(Diag.Conversion.ConfigA);
     if (FALSE == returnBool)
     {
         iStatus = -1;
@@ -280,7 +283,7 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed set config");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    returnBool = HMC5883_Custom_Check_Config(HkTlm.ConfigA);
+    returnBool = HMC5883_Custom_Check_Config(Diag.Conversion.ConfigA);
     if (FALSE == returnBool)
     {
         iStatus = -1;
@@ -469,6 +472,11 @@ void HMC5883::ProcessAppCmds(CFE_SB_Msg_t* MsgPtr)
                 HkTlm.usCmdErrCnt = 0;
                 break;
 
+            case HMC5883_SEND_DIAG_CC:
+                SendDiag();
+                break;
+
+
             default:
                 HkTlm.usCmdErrCnt++;
                 (void) CFE_EVS_SendEvent(HMC5883_CC_ERR_EID, CFE_EVS_ERROR,
@@ -500,6 +508,13 @@ void HMC5883::SendSensorMagMsg()
 {
     CFE_SB_TimeStampMsg((CFE_SB_Msg_t*)&SensorMagMsg);
     CFE_SB_SendMsg((CFE_SB_Msg_t*)&SensorMagMsg);
+}
+
+
+void HMC5883::SendDiag()
+{
+    CFE_SB_TimeStampMsg((CFE_SB_Msg_t*)&Diag);
+    CFE_SB_SendMsg((CFE_SB_Msg_t*)&Diag);
 }
 
 
@@ -640,20 +655,21 @@ void HMC5883::ReadDevice(void)
     //SensorMagMsg.XRaw = xraw_f;
     //SensorMagMsg.YRaw = yraw_f;
     //SensorMagMsg.ZRaw = zraw_f;
+    
+    /* Apply unit conversion */
+    SensorMagMsg.X = xraw_f * (Diag.Conversion.Unit / Diag.Conversion.Divider);
+    SensorMagMsg.Y = yraw_f * (Diag.Conversion.Unit / Diag.Conversion.Divider);
+    SensorMagMsg.Z = zraw_f * (Diag.Conversion.Unit / Diag.Conversion.Divider);
 
-    /* Set calibrated values */
-    SensorMagMsg.X = ((xraw_f * (HkTlm.Unit / HkTlm.Divider)) - 
-            HkTlm.Calibration.x_offset) * HkTlm.Calibration.x_scale;
-    SensorMagMsg.Y = ((yraw_f * (HkTlm.Unit / HkTlm.Divider)) - 
-            HkTlm.Calibration.y_offset) * HkTlm.Calibration.y_scale;
-    SensorMagMsg.Z = ((zraw_f * (HkTlm.Unit / HkTlm.Divider)) - 
-            HkTlm.Calibration.z_offset) * HkTlm.Calibration.z_scale;
+    /* Appy calibration */
+    SensorMagMsg.X = (SensorMagMsg.X - Diag.Calibration.x_offset) * Diag.Calibration.x_scale;
+    SensorMagMsg.Y = (SensorMagMsg.Y - Diag.Calibration.y_offset) * Diag.Calibration.y_scale;
+    SensorMagMsg.Z = (SensorMagMsg.Z - Diag.Calibration.z_offset) * Diag.Calibration.z_scale;
 
     /* Set range */
-    SensorMagMsg.Range = HkTlm.Range;
-    
+    SensorMagMsg.Range = Diag.Conversion.Range;
     /* Set scale */
-    SensorMagMsg.Scaling = HkTlm.Scaling;
+    SensorMagMsg.Scaling = (Diag.Conversion.Unit / Diag.Conversion.Divider);
     
     /* Measure temperature every 10 mag samples */
     if(temp_count == 10)
@@ -677,7 +693,7 @@ end_of_function:
 }
 
 
-boolean HMC5883::SelfCalibrate(HMC5883_Calibration_t *Calibration)
+boolean HMC5883::SelfCalibrate(HMC5883_CalibrationMsg_t *Calibration)
 {
     uint8 range = 0;
     uint8 config = 0;

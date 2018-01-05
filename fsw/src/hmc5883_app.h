@@ -154,6 +154,8 @@ public:
 
     /** \brief Housekeeping Telemetry for downlink */
     HMC5883_HkTlm_t HkTlm;
+    /** \brief Diagnostic data for downlink */
+    HMC5883_DiagPacket_t Diag;
     /************************************************************************/
     /** \brief HMC5883 Driver Application (HMC5883) application entry point
      **
@@ -325,6 +327,18 @@ public:
     void SendSensorMagMsg(void);
     
     /************************************************************************/
+    /** \brief Sends a diagnostic message.
+     **
+     **  \par Description
+     **       This function publishes the diagnostic message.
+     **
+     **  \par Assumptions, External Events, and Notes:
+     **       None
+     **
+     *************************************************************************/
+    void SendDiag(void);
+
+    /************************************************************************/
     /** \brief Verify Command Length
      **
      **  \par Description
@@ -370,7 +384,7 @@ public:
     **  \returns    TRUE for success, FALSE for failure.
     **
     *************************************************************************/
-    boolean SelfCalibrate(HMC5883_Calibration_t *Calibration);
+    boolean SelfCalibrate(HMC5883_CalibrationMsg_t *Calibration);
 
     /************************************************************************/
     /** \brief Validate scale values.

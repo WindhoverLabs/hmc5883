@@ -121,6 +121,39 @@ extern "C" {
 */
 #define HMC5883_RESET_CC                (1)
 
+/** \hmc5883cmd Send Diagnostic Message
+**  
+**  \par Description
+**       Sends a diagnostic message.
+**
+**  \hmc5883cmdmnemonic \HMC5883_DIAG
+**
+**  \par Command Structure
+**       #HMC5883_NoArgCmd_t
+**
+**  \par Command Verification
+**       Successful execution of this command may be verified with
+**       the following telemetry:
+**       - \b \c \HMC5883_CMDACTPCNT       - command counter will be cleared
+**       - \b \c \HMC5883_CMDRJCTCNT       - command error counter will be cleared
+**       - The #HMC5883_CMD_INF_EID debug event message will be 
+**         generated when the command is executed
+** 
+**  \par Error Conditions
+**       This command may fail for the following reason(s):
+**       - Command packet length not as expected
+** 
+**  \par Evidence of failure may be found in the following telemetry: 
+**       - \b \c \HMC5883_CMDRJCTCNT - command error counter will increment
+**       - Error specific event message #HMC5883_MSGID_ERR_EID
+**
+**  \par Criticality
+**       None
+**
+**  \sa #HMC5883_SEND_DIAG_CC
+*/
+#define HMC5883_SEND_DIAG_CC            (2)
+
 /************************************************************************
 ** Local Structure Declarations
 *************************************************************************/
@@ -138,14 +171,31 @@ typedef struct
 
 typedef struct
 {
-    float                   x_scale;
-    float                   y_scale;
-    float                   z_scale;
-    float                   x_offset;
-    float                   y_offset;
-    float                   z_offset;
-} HMC5883_Calibration_t;
+    float              x_scale;
+    float              y_scale;
+    float              z_scale;
+    float              x_offset;
+    float              y_offset;
+    float              z_offset;
+    uint8              Rotation;
+} HMC5883_CalibrationMsg_t;
 
+
+typedef struct
+{
+    /** \brief Current range value */
+    float              Range;
+    /** \brief Current scale value */
+    float              Scaling;
+    /** \brief Current unit value */
+    float              Unit;
+    /** \brief Current divider value */
+    float              Divider;
+    /** \brief Current Device configuration register A value */
+    uint8              ConfigA;
+    /** \brief Current Device configuration register B value */
+    uint8              ConfigB;
+} HMC5883_ConversionMsg_t;
 
 /** 
 **  \brief HMC5883 application housekeeping data
@@ -162,23 +212,20 @@ typedef struct
     /** \hmc5883tlmmnemonic \HMC5883_CMDRJCTCNT
         \brief Count of failed commands */
     uint8              usCmdErrCnt; 
-    /** \brief Current HMC5883 calibration values */
-    HMC5883_Calibration_t   Calibration;
     /** \brief App State */
     uint8              State;
-    /** \brief Current range value */
-    float              Range;
-    /** \brief Current scale value */
-    float              Scaling;
-    /** \brief Current unit value */
-    float              Unit;
-    /** \brief Current divider value */
-    float              Divider;
-    /** \brief Current Device configuration register A value */
-    uint8              ConfigA;
-    /** \brief Current Device configuration register B value */
-    uint8              ConfigB;
 } HMC5883_HkTlm_t;
+
+
+/** 
+**  \brief HMC5883 diagnostic data
+*/
+typedef struct
+{
+    uint8           TlmHeader[CFE_SB_TLM_HDR_SIZE];
+    HMC5883_CalibrationMsg_t          Calibration;
+    HMC5883_ConversionMsg_t           Conversion;
+} HMC5883_DiagPacket_t;
 
 
 #ifdef __cplusplus

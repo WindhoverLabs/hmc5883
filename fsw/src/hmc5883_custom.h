@@ -302,7 +302,7 @@ boolean HMC5883_Custom_Get_Config(uint8 *Config);
 *************************************************************************/
 boolean HMC5883_Custom_Measure_Temp(int16 *Temp);
 
-
+void HMC5883_Get_Rotation(uint8 *Rotation);
 
 
 #ifdef __cplusplus
