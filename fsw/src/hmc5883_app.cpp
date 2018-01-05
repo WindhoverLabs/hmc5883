@@ -291,8 +291,11 @@ int32 HMC5883::InitApp()
             "HMC5883 Device failed check config");
         goto HMC5883_InitApp_Exit_Tag;
     }
-    
+
+    /* Get the rotation from custom for diag */
+    HMC5883_Get_Rotation(&Diag.Calibration.Rotation);
     /* Register the cleanup callback */
+
     iStatus = OS_TaskInstallDeleteHandler(&HMC5883_CleanupCallback);
     if (iStatus != CFE_SUCCESS)
     {
