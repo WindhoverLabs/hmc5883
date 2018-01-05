@@ -178,6 +178,9 @@ typedef struct
     float              y_offset;
     float              z_offset;
     uint8              Rotation;
+    float              x_scale_internal;
+    float              y_scale_internal;    
+    float              z_scale_internal;
 } HMC5883_CalibrationMsg_t;
 
 

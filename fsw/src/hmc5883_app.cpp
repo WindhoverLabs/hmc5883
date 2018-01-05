@@ -193,7 +193,7 @@ void HMC5883::InitData()
     Diag.Conversion.ConfigB   = HMC5883_BITS_CONFIG_B_RANGE_1GA3;
     /* Set range and scale */
     Diag.Conversion.Range     = HMC5883_CALC_MAG_RANGE;
-    Diag.Conversion.Scaling   = HMC5883_CALC_MAG_SCALING;
+    Diag.Conversion.Scaling   = (HMC5883_MAG_UNIT / HMC5883_MAG_DIVIDER);
     Diag.Conversion.Unit      = HMC5883_MAG_UNIT;
     Diag.Conversion.Divider   = HMC5883_MAG_DIVIDER;
 }
@@ -646,6 +646,11 @@ void HMC5883::ReadDevice(void)
     xraw_f = SensorMagMsg.XRaw;
     yraw_f = SensorMagMsg.YRaw;
     zraw_f = SensorMagMsg.ZRaw;
+    
+    /* Apply internal calibration before rotation */
+    xraw_f = xraw_f * Diag.Calibration.x_scale_internal;
+    yraw_f = yraw_f * Diag.Calibration.y_scale_internal;
+    zraw_f = zraw_f * Diag.Calibration.z_scale_internal;
 
     /* Apply any rotation */
     returnBool = HMC5883_Apply_Platform_Rotation(&xraw_f, &yraw_f, &zraw_f);
@@ -801,52 +806,15 @@ boolean HMC5883::SelfCalibrate(HMC5883_CalibrationMsg_t *Calibration)
     scaling[0] = sum_excited[0] / good_count;
     scaling[1] = sum_excited[1] / good_count;
     scaling[2] = sum_excited[2] / good_count;
-    
-    /* TODO move to internal calibration so rotation doesn't need to be
-     * applied */
-    if (scaling[0] < 0)
-    {
-        xNeg = TRUE;
-    }
-    if (scaling[1] < 0)
-    {
-        yNeg = TRUE;
-    }
-    if (scaling[2] < 0)
-    {
-        zNeg = TRUE;
-    }
-    
-    /* Apply platform rotation to the calibration scale factors */
-    returnBool = HMC5883_Apply_Platform_Rotation(&scaling[0], &scaling[1], &scaling[2]);
-    if(FALSE == returnBool)
-    {
-        goto end_of_function;
-    }
-
-    /* TODO move to internal calibration so rotation doesn't need to be
-     * applied */
-    if (scaling[0] < 0 && FALSE == xNeg)
-    {
-        scaling[0] = fabs(scaling[0]);
-    }
-    if (scaling[1] < 0 && FALSE == yNeg)
-    {
-        scaling[1] = fabs(scaling[1]);
-    }
-    if (scaling[2] < 0 && FALSE == zNeg)
-    {
-        scaling[2] = fabs(scaling[2]);
-    }
 
     /* Sanity check scale values */
     returnBool = CheckScale(scaling[0], scaling[1], scaling[2]);
     if (TRUE == returnBool)
     {
         /* Set scaling  */
-        Calibration->x_scale  = 1.0f / scaling[0];
-        Calibration->y_scale  = 1.0f / scaling[1];
-        Calibration->z_scale  = 1.0f / scaling[2];
+        Calibration->x_scale_internal  = 1.0f / scaling[0];
+        Calibration->y_scale_internal  = 1.0f / scaling[1];
+        Calibration->z_scale_internal  = 1.0f / scaling[2];
     }
 
 end_of_function:
