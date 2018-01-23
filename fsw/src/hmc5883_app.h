@@ -68,6 +68,14 @@ extern "C" {
 */
 #define HMC5883_BITS_CONFIG_B_RANGE_1GA3          (0x01 << 5)
 
+/** \brief Gain setting 820.
+**
+**  \par Description:
+**       Gain setting Recommended Sensor Field Range +- 1.9 Ga,
+**       Gain (LSb/Gauss) 820, Digital Resoluation (mG/LSb) 1.22.
+*/
+#define HMC5883_BITS_CONFIG_B_RANGE_1GA9          (0x02 << 5)
+
 /** \brief Gain setting 660.
 **
 **  \par Description:

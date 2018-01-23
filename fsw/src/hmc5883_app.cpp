@@ -188,9 +188,13 @@ void HMC5883::InitData()
     Diag.Calibration.x_offset = 0.0f;
     Diag.Calibration.y_offset = 0.0f;
     Diag.Calibration.z_offset = 0.0f;
+    /* Set sane internal calibration values */
+    Diag.Calibration.x_scale_internal = 1.0f;
+    Diag.Calibration.y_scale_internal = 1.0f;
+    Diag.Calibration.z_scale_internal = 1.0f;
     /* Conversion values */
     Diag.Conversion.ConfigA   = (HMC5883_BITS_CONFIG_A_DEFAULT | HMC5983_TEMP_SENSOR_ENABLE);
-    Diag.Conversion.ConfigB   = HMC5883_BITS_CONFIG_B_RANGE_1GA3;
+    Diag.Conversion.ConfigB   = HMC5883_BITS_CONFIG_B_RANGE_1GA9;
     /* Set range and scale */
     Diag.Conversion.Range     = HMC5883_CALC_MAG_RANGE;
     Diag.Conversion.Scaling   = (HMC5883_MAG_UNIT / HMC5883_MAG_DIVIDER);
@@ -660,9 +664,9 @@ void HMC5883::ReadDevice(void)
     }
 
     /* Apply rotation to raw report as well */
-    //SensorMagMsg.XRaw = xraw_f;
-    //SensorMagMsg.YRaw = yraw_f;
-    //SensorMagMsg.ZRaw = zraw_f;
+    SensorMagMsg.XRaw = xraw_f;
+    SensorMagMsg.YRaw = yraw_f;
+    SensorMagMsg.ZRaw = zraw_f;
     
     /* Apply unit conversion */
     SensorMagMsg.X = xraw_f * (Diag.Conversion.Unit / Diag.Conversion.Divider);
@@ -782,7 +786,6 @@ boolean HMC5883::SelfCalibrate(HMC5883_CalibrationMsg_t *Calibration)
         cal[0] = fabsf(expected_cal[0] / (rawX * rangeScale));
         cal[1] = fabsf(expected_cal[1] / (rawY * rangeScale));
         cal[2] = fabsf(expected_cal[2] / (rawZ * rangeScale));
-
 
         if (cal[0] > 0.3f && cal[0] < 1.7f &&
             cal[1] > 0.3f && cal[1] < 1.7f &&
