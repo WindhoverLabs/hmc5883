@@ -11,7 +11,7 @@
 #include "hmc5883_app.h"
 #include "hmc5883_msg.h"
 #include "hmc5883_version.h"
-#include "lib/px4lib.h"
+#include "px4lib.h"
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
