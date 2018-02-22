@@ -501,6 +501,7 @@ void HMC5883::ProcessAppCmds(CFE_SB_Msg_t* MsgPtr)
 
 void HMC5883::ReportHousekeeping()
 {
+	memcpy(&HkTlm.SensorMagMsg, &SensorMagMsg, sizeof(SensorMagMsg));
     CFE_SB_TimeStampMsg((CFE_SB_Msg_t*)&HkTlm);
     CFE_SB_SendMsg((CFE_SB_Msg_t*)&HkTlm);
 }

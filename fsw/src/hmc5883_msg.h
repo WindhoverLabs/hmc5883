@@ -46,6 +46,7 @@ extern "C" {
 #endif
 
 #include "cfe.h"
+#include "px4_msgs.h"
 
 
 /************************************************************************
@@ -217,6 +218,8 @@ typedef struct
     uint8              usCmdErrCnt; 
     /** \brief App State */
     uint8              State;
+
+    PX4_SensorMagMsg_t SensorMagMsg;
 } HMC5883_HkTlm_t;
 
 
