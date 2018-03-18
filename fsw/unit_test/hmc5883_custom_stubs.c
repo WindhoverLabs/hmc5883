@@ -71,6 +71,11 @@ int32 HMC5883_Custom_Init_EventFilters(int32 ind, CFE_EVS_BinFilter_t *EventTbl)
 
 boolean HMC5883_Custom_Measure(int16 *X, int16 *Y, int16 *Z)
 {
+    /* Values set to pass self-calibration in initialization */
+    *X = 700.0f;
+    *Y = 700.0f;
+    *Z = 700.0f;
+
     return TRUE;
 }
 
