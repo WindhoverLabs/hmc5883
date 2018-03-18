@@ -131,6 +131,20 @@ typedef enum
 
 
 /**
+ * \brief application parameters
+ */
+typedef struct
+{
+    float x_scale;
+    float y_scale;
+    float z_scale;
+    float x_offset;
+    float y_offset;
+    float z_offset;
+} HMC5883_Params_t;
+
+
+/**
  **  \brief HMC5883 Application Class
  */
 class HMC5883
@@ -157,13 +171,19 @@ public:
 
     /** \brief Config Table Pointer */
     HMC5883_ConfigTbl_t* ConfigTblPtr;
+    
     /** \brief Output Data published at the end of cycle */
     PX4_SensorMagMsg_t SensorMagMsg;
-
+    
+    /** \brief params from the config table */
+    HMC5883_Params_t m_Params;
+    
     /** \brief Housekeeping Telemetry for downlink */
     HMC5883_HkTlm_t HkTlm;
+    
     /** \brief Diagnostic data for downlink */
     HMC5883_DiagPacket_t Diag;
+
     /************************************************************************/
     /** \brief HMC5883 Driver Application (HMC5883) application entry point
      **
@@ -472,6 +492,16 @@ public:
     **
     *************************************************************************/
     static int32  ValidateConfigTbl(void*);
+    
+    /************************************************************************/
+    /** \brief Update parameters from the configuration table.
+     **
+     **  \par Description
+     **       This function updates the current paramamters from the 
+     **       currently loaded configuration table.
+     **
+     *************************************************************************/
+    void UpdateParamsFromTable(void);
 };
 
 

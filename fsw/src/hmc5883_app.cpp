@@ -182,12 +182,7 @@ void HMC5883::InitData()
     /* Init custom data */
     HMC5883_Custom_InitData();
     /* Set initial values for calibration */
-    Diag.Calibration.x_scale  = 1.0f;
-    Diag.Calibration.y_scale  = 1.0f;
-    Diag.Calibration.z_scale  = 1.0f;
-    Diag.Calibration.x_offset = 0.0f;
-    Diag.Calibration.y_offset = 0.0f;
-    Diag.Calibration.z_offset = 0.0f;
+    UpdateParamsFromTable();
     /* Set sane internal calibration values */
     Diag.Calibration.x_scale_internal = 1.0f;
     Diag.Calibration.y_scale_internal = 1.0f;
@@ -675,9 +670,9 @@ void HMC5883::ReadDevice(void)
     SensorMagMsg.Z = zraw_f * (Diag.Conversion.Unit / Diag.Conversion.Divider);
 
     /* Appy calibration */
-    SensorMagMsg.X = (SensorMagMsg.X - Diag.Calibration.x_offset) * Diag.Calibration.x_scale;
-    SensorMagMsg.Y = (SensorMagMsg.Y - Diag.Calibration.y_offset) * Diag.Calibration.y_scale;
-    SensorMagMsg.Z = (SensorMagMsg.Z - Diag.Calibration.z_offset) * Diag.Calibration.z_scale;
+    SensorMagMsg.X = (SensorMagMsg.X - m_Params.x_offset) * m_Params.x_scale;
+    SensorMagMsg.Y = (SensorMagMsg.Y - m_Params.y_offset) * m_Params.y_scale;
+    SensorMagMsg.Z = (SensorMagMsg.Z - m_Params.z_offset) * m_Params.z_scale;
 
     /* Set range */
     SensorMagMsg.Range = Diag.Conversion.Range;
@@ -877,6 +872,28 @@ boolean CheckOffset(float X, float Y, float Z)
 }
 
 
+void HMC5883::UpdateParamsFromTable(void)
+{
+    if(0 != ConfigTblPtr)
+    {
+        /* Copy to m_Params from the config table */
+        m_Params.x_scale = ConfigTblPtr->x_scale;
+        m_Params.y_scale = ConfigTblPtr->y_scale;
+        m_Params.z_scale = ConfigTblPtr->z_scale;
+        m_Params.x_offset = ConfigTblPtr->x_offset;
+        m_Params.y_offset = ConfigTblPtr->y_offset;
+        m_Params.z_offset = ConfigTblPtr->z_offset;
+        /* Copy to diagnostic message */
+        Diag.Calibration.x_scale  = m_Params.x_scale;
+        Diag.Calibration.y_scale  = m_Params.y_scale;
+        Diag.Calibration.z_scale  = m_Params.z_scale;
+        Diag.Calibration.x_offset = m_Params.x_offset;
+        Diag.Calibration.y_offset = m_Params.y_offset;
+        Diag.Calibration.z_offset = m_Params.z_offset;
+    }
+}
+
+
 void HMC5883_CleanupCallback(void)
 {
     oHMC5883.HkTlm.State = HMC5883_UNINITIALIZED;
@@ -886,6 +903,8 @@ void HMC5883_CleanupCallback(void)
         oHMC5883.HkTlm.State = HMC5883_INITIALIZED;
     }
 }
+
+
 /************************/
 /*  End of File Comment */
 /************************/

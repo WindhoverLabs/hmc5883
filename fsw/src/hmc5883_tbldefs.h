@@ -62,8 +62,13 @@ extern "C" {
 /** \brief Definition for a single config table entry */
 typedef struct
 {
-    /* TODO:  Define the configuration table. */
-	uint32  temp;
+    /* User calibration params */
+    float x_scale;
+    float y_scale;
+    float z_scale;
+    float x_offset;
+    float y_offset;
+    float z_offset;
 } HMC5883_ConfigTbl_t;
 
 
