@@ -217,19 +217,20 @@ void Test_HMC5883_InitPipe_Fail_CreateDATAPipe(void)
  **************************************************************************/
 /**
  * Test HMC5883_InitData()
+ * NOTE: no current way to fail
  */
 void Test_HMC5883_InitData(void)
 {
     HMC5883 oHMC5883;
 
-    /* Set a fail result */
+    int32 result = 1;
     int32 expected = CFE_SUCCESS;
 
     /* Execute the function being tested */
-    oHMC5883.InitData();
+    result = oHMC5883.InitApp();
 
     /* Verify results */
-    //UtAssert_True (result == expected, "InitData");
+    UtAssert_True (result == expected, "InitData");
 }
 
 
