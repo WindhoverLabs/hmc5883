@@ -85,7 +85,7 @@ extern "C" {
 **  \par Criticality
 **       None
 **
-**  \sa #HMC5883_RESET_CC
+**  \sa #HMC5883_NOOP_CC
 */
 #define HMC5883_NOOP_CC                 (0)
 
@@ -118,7 +118,7 @@ extern "C" {
 **  \par Criticality
 **       None
 **
-**  \sa #HMC5883_NOOP_CC
+**  \sa #HMC5883_RESET_CC
 */
 #define HMC5883_RESET_CC                (1)
 
@@ -135,10 +135,9 @@ extern "C" {
 **  \par Command Verification
 **       Successful execution of this command may be verified with
 **       the following telemetry:
-**       - \b \c \HMC5883_CMDACTPCNT       - command counter will be cleared
-**       - \b \c \HMC5883_CMDRJCTCNT       - command error counter will be cleared
-**       - The #HMC5883_CMD_INF_EID debug event message will be 
-**         generated when the command is executed
+**       - \b \c \HMC5883_CMDACPTCNT - command counter will increment
+**       - The #HMC5883_CMD_INF_EID informational event message will be 
+**         generated when the command is received
 ** 
 **  \par Error Conditions
 **       This command may fail for the following reason(s):
@@ -169,22 +168,36 @@ typedef struct
     uint8  ucCmdHeader[CFE_SB_CMD_HDR_SIZE];
 } HMC5883_NoArgCmd_t;
 
-
+/** 
+**  \brief HMC5883 calibration data
+*/
 typedef struct
 {
+    /** \brief Current external X-axis calibration */
     float              x_scale;
+    /** \brief Current external Y-axis calibration */
     float              y_scale;
+    /** \brief Current external Z-axis calibration */
     float              z_scale;
+    /** \brief Current external X-axis offset */
     float              x_offset;
+    /** \brief Current external Y-axis offset */
     float              y_offset;
+    /** \brief Current external Z-axis offset */
     float              z_offset;
+    /** \brief Current platform rotation */
     uint8              Rotation;
+    /** \brief Current internal X-axis self-calibration */
     float              x_scale_internal;
-    float              y_scale_internal;    
+    /** \brief Current internal Y-axis self-calibration */
+    float              y_scale_internal;
+    /** \brief Current internal Z-axis self-calibration */
     float              z_scale_internal;
 } HMC5883_CalibrationMsg_t;
 
-
+/** 
+**  \brief HMC5883 conversion data
+*/
 typedef struct
 {
     /** \brief Current range value */
@@ -208,20 +221,17 @@ typedef struct
 {
     /** \brief cFE SB Tlm Msg Hdr */
     uint8              TlmHeader[CFE_SB_TLM_HDR_SIZE];
-
     /** \hmc5883tlmmnemonic \HMC5883_CMDACPTCNT
         \brief Count of accepted commands */
     uint8              usCmdCnt;   
-
     /** \hmc5883tlmmnemonic \HMC5883_CMDRJCTCNT
         \brief Count of failed commands */
     uint8              usCmdErrCnt; 
     /** \brief App State */
     uint8              State;
-
+    /** \brief SensorMag message */
     PX4_SensorMagMsg_t SensorMagMsg;
 } HMC5883_HkTlm_t;
-
 
 /** 
 **  \brief HMC5883 diagnostic data
@@ -229,7 +239,9 @@ typedef struct
 typedef struct
 {
     uint8           TlmHeader[CFE_SB_TLM_HDR_SIZE];
+    /** \brief Calibration data */
     HMC5883_CalibrationMsg_t          Calibration;
+    /** \brief Conversion data */
     HMC5883_ConversionMsg_t           Conversion;
 } HMC5883_DiagPacket_t;
 

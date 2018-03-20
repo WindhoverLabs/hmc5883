@@ -4,9 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include <float.h>
-
 #include "cfe.h"
-
 #include "hmc5883_custom.h"
 #include "hmc5883_app.h"
 #include "hmc5883_msg.h"
@@ -61,14 +59,13 @@ int32 HMC5883::InitEvent()
      * Note: 0 is the CFE_EVS_NO_FILTER mask and event 0 is reserved (not used) */
     memset(EventTbl, 0x00, sizeof(EventTbl));
     
-    /* TODO: Choose the events you want to filter.  CFE_EVS_MAX_EVENT_FILTERS
-     * limits the number of filters per app.  An explicit CFE_EVS_NO_FILTER 
-     * (the default) has been provided as an example. */
+    /* CFE_EVS_MAX_EVENT_FILTERS limits the number of filters per app.  
+     * An explicit CFE_EVS_NO_FILTER (the default) has been provided as
+     * an example. */
     EventTbl[  ind].EventID = HMC5883_RESERVED_EID;
     EventTbl[ind++].Mask    = CFE_EVS_NO_FILTER;
     EventTbl[  ind].EventID = HMC5883_READ_ERR_EID;
     EventTbl[ind++].Mask    = CFE_EVS_FIRST_16_STOP;
-    
     
     /* Add custom events to the filter table */
     customEventCount = HMC5883_Custom_Init_EventFilters(ind, EventTbl);
@@ -293,8 +290,8 @@ int32 HMC5883::InitApp()
 
     /* Get the rotation from custom for diag */
     HMC5883_Get_Rotation(&Diag.Calibration.Rotation);
-    /* Register the cleanup callback */
 
+    /* Register the cleanup callback */
     iStatus = OS_TaskInstallDeleteHandler(&HMC5883_CleanupCallback);
     if (iStatus != CFE_SUCCESS)
     {

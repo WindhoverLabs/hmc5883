@@ -46,7 +46,6 @@ extern "C" {
  ** Includes
  *************************************************************************/
 #include "cfe.h"
-
 #include "hmc5883_platform_cfg.h"
 #include "hmc5883_mission_cfg.h"
 #include "hmc5883_perfids.h"
@@ -135,11 +134,17 @@ typedef enum
  */
 typedef struct
 {
+    /*! Param X-axis calibration scale */
     float x_scale;
+    /*! Param Y-axis calibration scale */
     float y_scale;
+    /*! Param Z-axis calibration scale */
     float z_scale;
+    /*! Param X-axis calibration offset */
     float x_offset;
+    /*! Param Y-axis calibration offset */
     float y_offset;
+    /*! Param Z-axis calibration offset */
     float z_offset;
 } HMC5883_Params_t;
 

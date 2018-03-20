@@ -33,6 +33,7 @@
 
 #ifndef HMC5883_CUSTOM_H
 #define HMC5883_CUSTOM_H
+
 /************************************************************************
 ** Pragmas
 *************************************************************************/
@@ -72,7 +73,6 @@ extern "C" {
 *************************************************************************/
 void HMC5883_Custom_InitData(void);
 
-
 /************************************************************************/
 /** \brief Custom function to initialize custom device(s).
 **
@@ -87,7 +87,6 @@ void HMC5883_Custom_InitData(void);
 **
 *************************************************************************/
 boolean HMC5883_Custom_Init(void);
-
 
 /************************************************************************/
 /** \brief Custom function to uninitialize custom device(s).
@@ -105,7 +104,6 @@ boolean HMC5883_Custom_Init(void);
 **
 *************************************************************************/
 boolean HMC5883_Custom_Uninit(void);
-
 
 /************************************************************************/
 /** \brief Custom function to initialize custom events. 
@@ -129,7 +127,6 @@ boolean HMC5883_Custom_Uninit(void);
 *************************************************************************/
 int32 HMC5883_Custom_Init_EventFilters(int32 ind, CFE_EVS_BinFilter_t *EventTbl);
 
-
 /************************************************************************/
 /** \brief Read magnetometer values from the HMC5883.
 **
@@ -147,7 +144,6 @@ int32 HMC5883_Custom_Init_EventFilters(int32 ind, CFE_EVS_BinFilter_t *EventTbl)
 **
 *************************************************************************/
 boolean HMC5883_Custom_Measure(int16 *X, int16 *Y, int16 *Z);
-
 
 /************************************************************************/
 /** \brief Apply any required rotation of the sensor x, y, and z axis.
@@ -167,7 +163,6 @@ boolean HMC5883_Custom_Measure(int16 *X, int16 *Y, int16 *Z);
 *************************************************************************/
 boolean HMC5883_Apply_Platform_Rotation(float *X, float *Y, float *Z);
 
-
 /************************************************************************/
 /** \brief Apply any required rotation of the sensor x, y, and z axis.
 **
@@ -186,7 +181,6 @@ boolean HMC5883_Apply_Platform_Rotation(float *X, float *Y, float *Z);
 *************************************************************************/
 boolean HMC5883_Apply_Platform_Rotation_Float(float *X, float *Y, float *Z);
 
-
 /************************************************************************/
 /** \brief Validate the device ID.
 **
@@ -197,7 +191,6 @@ boolean HMC5883_Apply_Platform_Rotation_Float(float *X, float *Y, float *Z);
 **
 *************************************************************************/
 boolean HMC5883_Custom_ValidateID(void);
-
 
 /************************************************************************/
 /** \brief Set the sensor field range (gain).
@@ -213,7 +206,6 @@ boolean HMC5883_Custom_ValidateID(void);
 *************************************************************************/
 boolean HMC5883_Custom_Set_Range(uint8 Range);
 
-
 /************************************************************************/
 /** \brief Get the sensor field range (gain).
 **
@@ -227,7 +219,6 @@ boolean HMC5883_Custom_Set_Range(uint8 Range);
 **
 *************************************************************************/
 boolean HMC5883_Custom_Get_Range(uint8 *Range);
-
 
 /************************************************************************/
 /** \brief Check the value of the sensor field range (gain).
@@ -243,7 +234,6 @@ boolean HMC5883_Custom_Get_Range(uint8 *Range);
 *************************************************************************/
 boolean HMC5883_Custom_Check_Range(uint8 Range);
 
-
 /************************************************************************/
 /** \brief Set the sensor configuration.
 **
@@ -257,7 +247,6 @@ boolean HMC5883_Custom_Check_Range(uint8 Range);
 **
 *************************************************************************/
 boolean HMC5883_Custom_Check_Config(uint8 Config);
-
 
 /************************************************************************/
 /** \brief Check the value of the sensor configuration.
@@ -273,7 +262,6 @@ boolean HMC5883_Custom_Check_Config(uint8 Config);
 **
 *************************************************************************/
 boolean HMC5883_Custom_Set_Config(uint8 Config);
-
 
 /************************************************************************/
 /** \brief Get the value of the sensor configuration.
@@ -302,6 +290,15 @@ boolean HMC5883_Custom_Get_Config(uint8 *Config);
 *************************************************************************/
 boolean HMC5883_Custom_Measure_Temp(int16 *Temp);
 
+/************************************************************************/
+/** \brief Get the platform rotation.
+**
+**  \par Description
+**       This function returns the current platform rotation.
+**
+**  \param [out]    Rotation    The current rotation enum.
+**
+*************************************************************************/
 void HMC5883_Get_Rotation(uint8 *Rotation);
 
 

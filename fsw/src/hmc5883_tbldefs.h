@@ -63,11 +63,17 @@ extern "C" {
 typedef struct
 {
     /* User calibration params */
+    /** \brief Param x_scale calibration */
     float x_scale;
+    /** \brief Param y_scale calibration */
     float y_scale;
+    /** \brief Param z_scale calibration */
     float z_scale;
+    /** \brief Param x_scale offset */
     float x_offset;
+    /** \brief Param y_scale offset */
     float y_offset;
+    /** \brief Param z_scale offset */
     float z_offset;
 } HMC5883_ConfigTbl_t;
 
