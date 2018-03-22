@@ -138,15 +138,15 @@ int32 HMC5883::InitPipe()
 
     /* Init schedule pipe and subscribe to wakeup messages */
     iStatus = CFE_SB_CreatePipe(&SchPipeId,
-    		HMC5883_SCH_PIPE_DEPTH,
-			HMC5883_SCH_PIPE_NAME);
+            HMC5883_SCH_PIPE_DEPTH,
+            HMC5883_SCH_PIPE_NAME);
     if (iStatus == CFE_SUCCESS)
     {
         iStatus = CFE_SB_SubscribeEx(HMC5883_WAKEUP_MID, SchPipeId, CFE_SB_Default_Qos, HMC5883_WAKEUP_MID_MAX_MSG_COUNT);
         if (iStatus != CFE_SUCCESS)
         {
             (void) CFE_EVS_SendEvent(HMC5883_SUBSCRIBE_ERR_EID, CFE_EVS_ERROR,
-            		"Sch Pipe failed to subscribe to HMC5883_WAKEUP_MID. (0x%08lX)",
+                    "Sch Pipe failed to subscribe to HMC5883_WAKEUP_MID. (0x%08lX)",
                     iStatus);
             goto HMC5883_InitPipe_Exit_Tag;
         }
@@ -155,23 +155,23 @@ int32 HMC5883::InitPipe()
         if (iStatus != CFE_SUCCESS)
         {
             (void) CFE_EVS_SendEvent(HMC5883_SUBSCRIBE_ERR_EID, CFE_EVS_ERROR,
-					 "CMD Pipe failed to subscribe to HMC5883_SEND_HK_MID. (0x%08X)",
-					 (unsigned int)iStatus);
+                     "CMD Pipe failed to subscribe to HMC5883_SEND_HK_MID. (0x%08X)",
+                     (unsigned int)iStatus);
             goto HMC5883_InitPipe_Exit_Tag;
         }
     }
     else
     {
         (void) CFE_EVS_SendEvent(HMC5883_PIPE_INIT_ERR_EID, CFE_EVS_ERROR,
-			 "Failed to create SCH pipe (0x%08lX)",
-			 iStatus);
+             "Failed to create SCH pipe (0x%08lX)",
+             iStatus);
         goto HMC5883_InitPipe_Exit_Tag;
     }
 
     /* Init command pipe and subscribe to command messages */
     iStatus = CFE_SB_CreatePipe(&CmdPipeId,
-    		HMC5883_CMD_PIPE_DEPTH,
-			HMC5883_CMD_PIPE_NAME);
+            HMC5883_CMD_PIPE_DEPTH,
+            HMC5883_CMD_PIPE_NAME);
     if (iStatus == CFE_SUCCESS)
     {
         /* Subscribe to command messages */
@@ -180,16 +180,16 @@ int32 HMC5883::InitPipe()
         if (iStatus != CFE_SUCCESS)
         {
             (void) CFE_EVS_SendEvent(HMC5883_SUBSCRIBE_ERR_EID, CFE_EVS_ERROR,
-				 "CMD Pipe failed to subscribe to HMC5883_CMD_MID. (0x%08lX)",
-				 iStatus);
+                 "CMD Pipe failed to subscribe to HMC5883_CMD_MID. (0x%08lX)",
+                 iStatus);
             goto HMC5883_InitPipe_Exit_Tag;
         }
     }
     else
     {
         (void) CFE_EVS_SendEvent(HMC5883_PIPE_INIT_ERR_EID, CFE_EVS_ERROR,
-			 "Failed to create CMD pipe (0x%08lX)",
-			 iStatus);
+             "Failed to create CMD pipe (0x%08lX)",
+             iStatus);
         goto HMC5883_InitPipe_Exit_Tag;
     }
 
@@ -367,7 +367,6 @@ HMC5883_InitApp_Exit_Tag:
 /* Receive and Process Messages                                    */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 int32 HMC5883::RcvSchPipeMsg(int32 iBlocking)
 {
     int32           iStatus=CFE_SUCCESS;
@@ -434,7 +433,6 @@ int32 HMC5883::RcvSchPipeMsg(int32 iBlocking)
 /* Process Incoming Commands                                       */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 void HMC5883::ProcessCmdPipe()
 {
     int32 iStatus = CFE_SUCCESS;
@@ -483,7 +481,6 @@ void HMC5883::ProcessCmdPipe()
 /* Process HMC5883 Commands                                        */
 /*                                                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 void HMC5883::ProcessAppCmds(CFE_SB_Msg_t* MsgPtr)
 {
     uint32  uiCmdCode=0;
@@ -530,7 +527,7 @@ void HMC5883::ProcessAppCmds(CFE_SB_Msg_t* MsgPtr)
 
 void HMC5883::ReportHousekeeping()
 {
-	memcpy(&HkTlm.SensorMagMsg, &SensorMagMsg, sizeof(SensorMagMsg));
+    memcpy(&HkTlm.SensorMagMsg, &SensorMagMsg, sizeof(SensorMagMsg));
     CFE_SB_TimeStampMsg((CFE_SB_Msg_t*)&HkTlm);
     CFE_SB_SendMsg((CFE_SB_Msg_t*)&HkTlm);
 }

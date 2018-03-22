@@ -42,7 +42,6 @@ extern "C" {
 ** Local Defines
 *************************************************************************/
 
-
 /* Event IDs
  * Conventions: _EID is the event identifier.  _EVT_CNT is the total number of
  * events and should always be last.  Events can be added before _EVT_CNT.
@@ -51,7 +50,7 @@ extern "C" {
 typedef enum {
 
 /** \brief <tt> Value of zero is reserved, and should not be used. </tt> */
-	HMC5883_RESERVED_EID = 0,  /* Do not use this event ID */
+    HMC5883_RESERVED_EID = 0,  /* Do not use this event ID */
 
 /** \brief <tt> 'Initialized. Version \%d.\%d.\%d.\%d' </tt>
 **  \event <tt> 'Initialized. Version \%d.\%d.\%d.\%d' </tt>
@@ -72,7 +71,7 @@ typedef enum {
 **  The fourth \c %d field contains the application revision number defined
 **      in #HMC5883_MISSION_REV.
 */
-	HMC5883_INIT_INF_EID,
+    HMC5883_INIT_INF_EID,
 
 /** \brief <tt> 'Recvd NOOP. Version \%d.\%d.\%d.\%d' </tt>
 **  \event <tt> 'Recvd NOOP. Version \%d.\%d.\%d.\%d' </tt>
@@ -95,7 +94,7 @@ typedef enum {
 **  The fourth \c %d field contains the application revision number defined
 **      in #HMC5883_MISSION_REV.
 */
-	HMC5883_CMD_NOOP_EID,
+    HMC5883_CMD_NOOP_EID,
 
     /** \brief <tt> '\%s Pipe failed to subscribe to \%s. (0x\%08X)' </tt>
     **  \event <tt> '\%s Pipe failed to subscribe to \%s. (0x\%08X)' </tt>
@@ -112,7 +111,7 @@ typedef enum {
 **  The 32 bit hexadecimal number is the error code returned by CFE.
 **
 */
-	HMC5883_SUBSCRIBE_ERR_EID,
+    HMC5883_SUBSCRIBE_ERR_EID,
 
 /** \brief <tt> 'Failed to create \%s pipe (0x\%08X)' </tt>
 **  \event <tt> 'Failed to create \%s pipe (0x\%08X' </tt>
@@ -128,7 +127,7 @@ typedef enum {
 **  The 32 bit hexadecimal number is the error code returned by CFE.
 **
 */
-	HMC5883_PIPE_INIT_ERR_EID,
+    HMC5883_PIPE_INIT_ERR_EID,
 
 /** \brief <tt> 'Failed to manage Config table (0x\%08X)' </tt>
 **  \event <tt> 'Failed to manage Config table (0x\%08X)' </tt>
@@ -141,7 +140,7 @@ typedef enum {
 **  #CFE_TBL_Manage function.
 **
 */
-	HMC5883_CFGTBL_MANAGE_ERR_EID,
+    HMC5883_CFGTBL_MANAGE_ERR_EID,
 
 /** \brief <tt> 'Failed to get Config table's address (0x\%08X)' </tt>
 **  \event <tt> 'Failed to get Config table's address (0x\%08X)' </tt>
@@ -154,7 +153,7 @@ typedef enum {
 **  #CFE_TBL_GetAddress function.
 **
 */
-	HMC5883_CFGTBL_GETADDR_ERR_EID,
+    HMC5883_CFGTBL_GETADDR_ERR_EID,
 
 /** \brief <tt> '\%s pipe read error (0x\%08X).' </tt>
 **  \event <tt> '\%s pipe read error (0x\%08X).' </tt>
@@ -170,7 +169,7 @@ typedef enum {
 **  The 32 bit hexadecimal number is the error code returned by CFE.
 **
 */
-	HMC5883_RCVMSG_ERR_EID,
+    HMC5883_RCVMSG_ERR_EID,
 
 /** \brief <tt> 'Recvd invalid \%s msgId (0x\%04X)' </tt>
 **  \event <tt> 'Recvd invalid \%s msgId (0x\%04X)' </tt>
@@ -185,7 +184,7 @@ typedef enum {
 **  The \c %s field contains the name of the pipe.
 **  The 16 bit hexadecimal number is the actual message ID received.
 */
-	HMC5883_MSGID_ERR_EID,
+    HMC5883_MSGID_ERR_EID,
 
 /** \brief <tt> 'Recvd invalid command code (\%u)' </tt>
 **  \event <tt> 'Recvd invalid command code (\%u)' </tt>
@@ -199,7 +198,7 @@ typedef enum {
 **
 **  The %u field contains the actual command code received.
 */
-	HMC5883_CC_ERR_EID,
+    HMC5883_CC_ERR_EID,
 
 /** \brief <tt> 'Rcvd invalid msgLen: msgId=0x\%08X, cmdCode=\%d, msgLen=\%d, expectedLen=\%d" </tt>
 **  \event <tt> 'Rcvd invalid msgLen: msgId=0x\%08X, cmdCode=\%d, msgLen=\%d, expectedLen=\%d" </tt>
@@ -216,7 +215,7 @@ typedef enum {
 **  The third \c %d field contains the actual length.
 **  The fourth \c %d field contains the expected length.
 */
-	HMC5883_MSGLEN_ERR_EID,
+    HMC5883_MSGLEN_ERR_EID,
 
 /** \brief <tt> 'Failed to register config table (0x%08X)' </tt>
 **  \event <tt> 'Failed to register config table (0x%08X)' </tt>
@@ -232,7 +231,7 @@ typedef enum {
 **  #CFE_TBL_Register function.
 **
 */
-	HMC5883_CFGTBL_REG_ERR_EID,
+    HMC5883_CFGTBL_REG_ERR_EID,
 
 /** \brief <tt> 'Failed to load Config Table (0x%08X)' </tt>
 **  \event <tt> 'Failed to load Config Table (0x%08X)' </tt>
@@ -248,7 +247,7 @@ typedef enum {
 **  #CFE_TBL_Load function.
 **
 */
-	HMC5883_CFGTBL_LOAD_ERR_EID,
+    HMC5883_CFGTBL_LOAD_ERR_EID,
 /** \brief <tt> 'HMC5883 - ' </tt>
 **  \event <tt> 'HMC5883 - ' </tt>
 **  
@@ -325,7 +324,8 @@ typedef enum {
     HMC5883_OFFSET_ERR_EID,
 
 /** \brief <tt> This is a count of all the app events and should not be used. </tt> */
-	HMC5883_EVT_CNT
+    HMC5883_EVT_CNT
+
 } HMC5883_EventIds_t;
 
 
