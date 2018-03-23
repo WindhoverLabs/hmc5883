@@ -654,6 +654,11 @@ void HMC5883::AppMain()
 }
 
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                 */
+/* Read from the device                                            */
+/*                                                                 */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 void HMC5883::ReadDevice(void)
 {
     boolean returnBool = FALSE;
@@ -731,7 +736,11 @@ end_of_function:
 ;
 }
 
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                 */
+/* Run Self-Calibration Routine                                    */
+/*                                                                 */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 boolean HMC5883::SelfCalibrate(HMC5883_CalibrationMsg_t *Calibration)
 {
     uint8 range = 0;
@@ -863,6 +872,11 @@ end_of_function:
 }
 
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                 */
+/* Sanity Check Scale Values                                       */
+/*                                                                 */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 boolean HMC5883::CheckScale(float X, float Y, float Z)
 {
     boolean returnBool = FALSE;
@@ -882,7 +896,11 @@ boolean HMC5883::CheckScale(float X, float Y, float Z)
     return returnBool;
 }
 
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                 */
+/* Sanity Check Offset Values                                      */
+/*                                                                 */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 boolean CheckOffset(float X, float Y, float Z)
 {
     boolean returnBool = FALSE;
@@ -902,7 +920,11 @@ boolean CheckOffset(float X, float Y, float Z)
     return returnBool;
 }
 
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                 */
+/* Update Params from the Config Table                             */
+/*                                                                 */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 void HMC5883::UpdateParamsFromTable(void)
 {
     if(0 != ConfigTblPtr)
@@ -924,7 +946,11 @@ void HMC5883::UpdateParamsFromTable(void)
     }
 }
 
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                 */
+/* Cleanup prior to exit                                           */
+/*                                                                 */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 void HMC5883_CleanupCallback(void)
 {
     oHMC5883.HkTlm.State = HMC5883_UNINITIALIZED;
