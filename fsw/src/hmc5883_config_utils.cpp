@@ -57,7 +57,7 @@ extern "C" {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int32 HMC5883::InitConfigTbl()
 {
-    int32  iStatus=0;
+    int32  iStatus = 0;
 
     /* Register Config table */
     iStatus = CFE_TBL_Register(&ConfigTblHdl,
@@ -92,7 +92,7 @@ int32 HMC5883::InitConfigTbl()
     iStatus = AcquireConfigPointers();
 
 HMC5883_InitConfigTbl_Exit_Tag:
-    return iStatus;
+    return (iStatus);
 }
 
 
@@ -103,13 +103,13 @@ HMC5883_InitConfigTbl_Exit_Tag:
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int32 HMC5883::ValidateConfigTbl(void* ConfigTblPtr)
 {
-    int32  iStatus=0;
+    int32  iStatus = 0;
     HMC5883_ConfigTbl_t* HMC5883_ConfigTblPtr = (HMC5883_ConfigTbl_t*)(ConfigTblPtr);
 
     /* TODO:  Add validation code here. */
 
 HMC5883_ValidateConfigTbl_Exit_Tag:
-    return iStatus;
+    return (iStatus);
 }
 
 
@@ -159,7 +159,7 @@ int32 HMC5883::AcquireConfigPointers(void)
     }
 
 HMC5883_AcquireConfigPointers_Exit_Tag:
-    return iStatus;
+    return (iStatus);
 }
 
 
