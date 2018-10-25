@@ -322,6 +322,32 @@ typedef enum {
 **
 */
     HMC5883_OFFSET_ERR_EID,
+/** \brief <tt> 'Calibration values updated' </tt>
+**  \event <tt> 'Calibration values updated' </tt>
+**
+**  \par Type: INFORMATION
+**
+**  \par Cause:
+**
+**  This event message is issued when the calibration values
+**  are successfully updated.
+**
+*/
+    HMC5883_CALIBRATE_INF_EID,
+/** \brief <tt> 'Calibration values failed to update' </tt>
+**  \event <tt> 'Calibration values failed to update' </tt>
+**
+**  \par Type: ERROR
+**
+**  \par Cause:
+**
+**  This event message is issued when the calibration values
+**  failed to update.
+**
+*/
+    HMC5883_CALIBRATE_ERR_EID,
+
+
 
 /** \brief <tt> This is a count of all the app events and should not be used. </tt> */
     HMC5883_EVT_CNT

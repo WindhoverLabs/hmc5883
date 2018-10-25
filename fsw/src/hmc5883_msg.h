@@ -154,6 +154,36 @@ extern "C" {
 */
 #define HMC5883_SEND_DIAG_CC            (2)
 
+/** \hmc5883cmd Set Calibration Values
+**  
+**  \par Description
+**       Sets the sensor calibrations 
+**
+**  \par Command Structure
+**       #HMC5883_SetCalibrationCmd_t
+**
+**  \par Command Verification
+**       Successful execution of this command may be verified with
+**       the following telemetry:
+**       - \b \c \HMC5883_CMDACTPCNT       - command counter will be incremented
+**       - The #HMC5883_CALIBRATE_INF_EID debug event message will be 
+**         generated when the command is executed
+** 
+**  \par Error Conditions
+**       This command may fail for the following reason(s):
+**       - Command packet length not as expected
+** 
+**  \par Evidence of failure may be found in the following telemetry: 
+**       - \b \c \HMC5883_CMDRJCTCNT - command error counter will increment
+**       - Error specific event message #HMC5883_CALIBRATE_ERR_EID
+**
+**  \par Criticality
+**       None
+**
+**  \sa #HMC5883_SET_CALIBRATION_CC
+*/
+#define HMC5883_SET_CALIBRATION_CC      (3)
+
 /************************************************************************
 ** Local Structure Declarations
 *************************************************************************/
@@ -245,6 +275,16 @@ typedef struct
     HMC5883_ConversionMsg_t           Conversion;
 } HMC5883_DiagPacket_t;
 
+
+/** 
+**  \brief HMC5883 application struct for calibration cmd
+*/
+typedef struct
+{
+    uint8  ucCmdHeader[CFE_SB_CMD_HDR_SIZE];
+    /*! All calibration info */
+    HMC5883_CalibrationMsg_t Calibration;
+} HMC5883_SetCalibrationCmd_t;
 
 #ifdef __cplusplus
 }
