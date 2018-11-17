@@ -6,31 +6,31 @@ const CdrPlugin = require(path.join(global.CDR_INSTALL_DIR, '/commander/classes/
 
 module.exports = class CfeCdrPlugin extends CdrPlugin {
   constructor(urlBase) {
-    super('amc', path.join(__dirname, 'web', urlBase));
+    super('HMC5883', path.join(__dirname, 'web', urlBase));
   }
 
   getContent() {
     var result = {
-      shortDescription: 'Actuator and Motor Control',
-      longDescription: 'Actuator and Motor Control.',
+      shortDescription: 'HMC5883 Driver',
+      longDescription: 'HMC5883 Driver',
       nodes: {
 				main: {
 					type: CdrPlugin.ContentType.LAYOUT,
 					shortDescription: 'Main',
-					longDescription: 'Main AMC.',
+					longDescription: 'Main HMC5883.',
 					filePath: '/main_layout.lyt'
 				},
-				cdh: {
+				hk: {
 					type: CdrPlugin.ContentType.PANEL,
-					shortDescription: 'Command and Data Handling',
-					longDescription: 'Command counters.',
-					filePath: '/cdh.pug'
+					shortDescription: 'HMC5883 HK',
+					longDescription: 'HMC5883 Housekeeping',
+					filePath: '/hk.pug'
 				},
-                ao: {
+                diag: {
                     type: CdrPlugin.ContentType.PANEL,
-                    shortDescription: 'Actuator Outputs',
-                    longDescription: 'Actuator Outputs',
-                    filePath: '/ao.pug'
+                    shortDescription: 'HMC5883 Diag',
+                    longDescription: 'HMC5883 Diagnostics',
+                    filePath: '/diag.pug'
                 }
       }
     };
