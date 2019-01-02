@@ -38,6 +38,7 @@ add_airliner_app_def(hmc5883
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_config_utils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_events.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_msg.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_symbols.c
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_tbldefs.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_version.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_custom.h
@@ -47,6 +48,11 @@ add_airliner_app_def(hmc5883
 
     USER_DOCS   ${CMAKE_CURRENT_SOURCE_DIR}/user_doxy.in
     DESIGN_DOCS ${CMAKE_CURRENT_SOURCE_DIR}/detail_doxy.in
+    
+    MSG_OVERRIDES   ${CMAKE_CURRENT_SOURCE_DIR}/hmc5883_msg_overrides.json 
+
+    COMMANDER_PLUGIN
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../cdr
 )
 
 add_airliner_app_unit_test(hmc5883-ut
