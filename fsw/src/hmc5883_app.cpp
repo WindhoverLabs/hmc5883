@@ -522,6 +522,23 @@ void HMC5883::ProcessAppCmds(CFE_SB_Msg_t* MsgPtr)
                 SendDiag();
                 break;
             }
+            case HMC5883_SET_CALIBRATION_CC:
+            {
+                if(CFE_SUCCESS == UpdateCalibrationValues((HMC5883_SetCalibrationCmd_t *) MsgPtr))
+                {
+                    UpdateParamsFromTable();
+                    HkTlm.usCmdCnt++;
+                    (void) CFE_EVS_SendEvent(HMC5883_CALIBRATE_INF_EID, CFE_EVS_INFORMATION,
+                                  "Calibration values updated");
+                }
+                else
+                {
+                    HkTlm.usCmdErrCnt++;
+                    (void) CFE_EVS_SendEvent(HMC5883_CALIBRATE_ERR_EID, CFE_EVS_ERROR,
+                                  "Calibration values failed to update");
+                }
+                break;
+            }
             default:
             {
                 HkTlm.usCmdErrCnt++;
@@ -963,6 +980,30 @@ void HMC5883::UpdateParamsFromTable(void)
         Diag.Calibration.z_offset = m_Params.z_offset;
     }
     return;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                 */
+/* Update Calibration Values                                       */
+/*                                                                 */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+int32 HMC5883::UpdateCalibrationValues(HMC5883_SetCalibrationCmd_t *CalibrationMsgPtr) 
+{
+    int32 Status = -1;
+    
+    if(0 != ConfigTblPtr)
+    {
+        ConfigTblPtr->x_scale = CalibrationMsgPtr->Calibration.x_scale;
+        ConfigTblPtr->y_scale = CalibrationMsgPtr->Calibration.y_scale;
+        ConfigTblPtr->z_scale = CalibrationMsgPtr->Calibration.z_scale;
+        ConfigTblPtr->x_offset = CalibrationMsgPtr->Calibration.x_offset;
+        ConfigTblPtr->y_offset = CalibrationMsgPtr->Calibration.y_offset;
+        ConfigTblPtr->z_offset = CalibrationMsgPtr->Calibration.z_offset;
+        
+        Status = CFE_TBL_Modified(ConfigTblHdl);
+    }
+    
+    return Status;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
