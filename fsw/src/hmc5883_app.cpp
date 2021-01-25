@@ -47,6 +47,7 @@
 #include "hmc5883_msg.h"
 #include "hmc5883_version.h"
 #include "px4lib.h"
+#include "px4lib_msgids.h"
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
