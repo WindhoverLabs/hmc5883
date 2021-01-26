@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #############################################################################
-add_airliner_app_def(hmc5883
+buildliner_add_app_def(hmc5883
     FILE HMC5883
     SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hmc5883_app.cpp
@@ -53,7 +53,7 @@ add_airliner_app_def(hmc5883
         ${PROJECT_SOURCE_DIR}/apps/hmc5883/fsw/platform_inc
 )
 
-add_airliner_app_unit_test(hmc5883-ut
+buildliner_add_app_unit_test(hmc5883-ut
     UTASSERT
     NO_HELGRIND
     NO_MASSIF
